@@ -1,3 +1,4 @@
+#define STB_IMAGE_IMPLEMENTATION
 #include <iostream>
 #include <vector>
 #include <chrono>
@@ -13,7 +14,6 @@
 #include "Include/glm/gtc/matrix_transform.hpp"
 #include "Include/glm/gtc/type_ptr.hpp"
 
-#define STB_IMAGE_IMPLEMENTATION
 #include "Include/stb_image.h"
 
 #include <assimp/Importer.hpp>
@@ -115,8 +115,8 @@ int main()
    Shader WallShader("ShaderSource/vShader_Wall.glsl", "ShaderSource/fShader_Wall.glsl");
    Shader LightShader("ShaderSource/vShader_Light.glsl", "ShaderSource/fShader_Light.glsl");
 
-   Shader ModelShader_Knight("ShaderSource/vShader_Model.glsl", "ShaderSource/fShader_Model.glsl");
-   Shader ModelShader_JinXi("ShaderSource/vShader_Model.glsl", "ShaderSource/fShader_Model.glsl");
+   Shader ModelShader_Knight("ShaderSource/vShader_Model.glsl", "ShaderSource/fShader_PersonModel.glsl");
+   Shader ModelShader_JinXi("ShaderSource/vShader_Model.glsl", "ShaderSource/fShader_PersonModel.glsl");
 
    Shader FrameShader("ShaderSource/vShader_Frame.glsl", "ShaderSource/fShader_Frame.glsl");
 
