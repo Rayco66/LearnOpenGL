@@ -8,18 +8,21 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-//cameraÊôĞÔ
-extern glm::vec3 CameraPos;//cameraÎ»ÖÃ
+//ä¸€èˆ¬å±æ€§
+extern float PassedTime;//éæš‚åœæ—¶ç»è¿‡çš„æ—¶é—´
+
+//cameraå±æ€§
+extern glm::vec3 CameraPos;//cameraä½ç½®
 extern glm::vec3 CameraFront;
 
-//lightÊôĞÔ
-//µã¹âÔ´
+//lightå±æ€§
+//ç‚¹å…‰æº
 extern glm::vec3 PointLightPos;
 extern glm::vec3 PointLightColor;
-//Æ½ĞĞ¹â
+//å¹³è¡Œå…‰
 extern glm::vec3 DirectLightDirection;
 extern glm::vec3 DirectLightColor;
-//ÊÖµç¹â
+//æ‰‹ç”µå…‰
 extern glm::vec3 FlashLightColor;
 extern float InnerAngle;
 extern float OuterAngle;
@@ -31,12 +34,12 @@ protected:
     Model PersonModel;
     Shader* FrameShader;
 
-    //Ä£ĞÍ±ä»»¾ØÕó
+    //æ¨¡å‹å˜æ¢çŸ©é˜µ
     glm::mat4 ModelMatrix = glm::mat4(1.0f);
     glm::mat4 ViewMatrix = glm::mat4(1.0f);
     glm::mat4 ProjectionMatrix = glm::mat4(1.0f);
 
-    //±ß¿ò±ä»»¾ØÕó
+    //è¾¹æ¡†å˜æ¢çŸ©é˜µ
     glm::mat4 FModelMatrix = glm::mat4(1.0f);
 
 
@@ -44,7 +47,7 @@ public:
     PersonModelDraw(Shader& modelShader, Model& personModel, Shader* frameShader = nullptr) : ModelShader(modelShader), PersonModel(personModel), FrameShader(frameShader)
     {}
 
-    //»ñÈ¡Ïà¹Ø±ä»»¾ØÕó
+    //è·å–ç›¸å…³å˜æ¢çŸ©é˜µ
     void GetMatrix(glm::mat4 modelmatrix, glm::mat4 viewmatrix, glm::mat4 projectionmatrix)
     {
         ModelMatrix = modelmatrix;
@@ -52,26 +55,26 @@ public:
         ProjectionMatrix = projectionmatrix;
     }
 
-    //»ñÈ¡±ß¿ò±ä»»¾ØÕó
+    //è·å–è¾¹æ¡†å˜æ¢çŸ©é˜µ
     void GetFMatrix(glm::mat4 fmodelmatrix)
     {
         FModelMatrix = fmodelmatrix;
     }
 
 
-    //»ù´¡ÈËÎï×ÅÉ«Æ÷ÉèÖÃ
+    //åŸºç¡€äººç‰©ç€è‰²å™¨è®¾ç½®
     void BasicShaderSet()
     {
         ModelShader.Use();
-        //¼ÆËãÏà¹Ø
+        //è®¡ç®—ç›¸å…³
         ModelShader.setMat4("projection", ProjectionMatrix);
         ModelShader.setMat4("view", ViewMatrix);
         ModelShader.setMat4("model", ModelMatrix);
         ModelShader.setMat3("NormalMatrix", glm::mat3(glm::transpose(glm::inverse(ModelMatrix))));
         ModelShader.SetVec3("ViewPos", CameraPos);
-        //²ÄÖÊ
+        //æè´¨
         ModelShader.SetFloat("material.Shininess", 32.0f);
-        //µã¹âÔ´
+        //ç‚¹å…‰æº
         ModelShader.SetVec3("pointLight.Pos", PointLightPos);
         ModelShader.SetVec3("pointLight.Ambient", PointLightColor * glm::vec3(0.2f));
         ModelShader.SetVec3("pointLight.Diffuse", PointLightColor * glm::vec3(0.5f));
@@ -79,12 +82,12 @@ public:
         ModelShader.SetFloat("pointLight.constant", 1.0f);
         ModelShader.SetFloat("pointLight.linear", 0.35f);
         ModelShader.SetFloat("pointLight.quadratic", 0.44f);
-        //¶¨Ïò¹â
+        //å®šå‘å…‰
         ModelShader.SetVec3("directLight.Dir", DirectLightDirection);
         ModelShader.SetVec3("directLight.Ambient", DirectLightColor * glm::vec3(0.2f));
         ModelShader.SetVec3("directLight.Diffuse", DirectLightColor * glm::vec3(0.5f));
         ModelShader.SetVec3("directLight.Specular", DirectLightColor * glm::vec3(0.0f));
-        //ÊÖµç¹â
+        //æ‰‹ç”µå…‰
         ModelShader.SetVec3("flashLight.Pos", CameraPos);
         ModelShader.SetVec3("flashLight.Dir", CameraFront);
         ModelShader.SetVec3("flashLight.Diffuse", FlashLightColor * glm::vec3(0.5f));
@@ -96,10 +99,10 @@ public:
         ModelShader.SetFloat("flashLight.quadratic", 0.44f);
     }
 
-    //»ù´¡Ãè±ß×ÅÉ«Æ÷ÉèÖÃ
+    //åŸºç¡€æè¾¹ç€è‰²å™¨è®¾ç½®
     void BasicFShaderSet()
     {
-        //ÈôFrameShaderÖ¸Õë²»Îª¿Õ
+        //è‹¥FrameShaderæŒ‡é’ˆä¸ä¸ºç©º
         if (FrameShader)
         {
             FrameShader->Use();
@@ -108,58 +111,74 @@ public:
             FrameShader->setMat4("projection", ProjectionMatrix);
             FrameShader->setMat4("view", ViewMatrix);
             FrameShader->setMat3("NormalMatrix", glm::mat3(glm::transpose(glm::inverse(FModelMatrix))));
-            FrameShader->SetFloat("FixRate", 0.0001f);//´Ó0.001µ½0.0001£¬Ö±¹ÛĞ§¹ûÊÇ¸Ä±äÂÖÀªµÄ´ÖÏ¸
+            FrameShader->SetFloat("FixRate", 0.0001f);//ä»0.001åˆ°0.0001ï¼Œç›´è§‚æ•ˆæœæ˜¯æ”¹å˜è½®å»“çš„ç²—ç»†
             FrameShader->SetVec3("FrameColor", glm::vec3(1.0f, 0.0f, 0.0f));
         }
     }
+    
+    //é¡¶ç‚¹æ³•çº¿ç»˜åˆ¶
+    void NormalDraw()
+    {
+        ModelShader.Use();
+        //è®¡ç®—ç›¸å…³
+        ModelShader.setMat4("projection", ProjectionMatrix);
+        ModelShader.setMat4("view", ViewMatrix);
+        ModelShader.setMat4("model", ModelMatrix);
+        ModelShader.setMat3("NormalMatrix", glm::mat3(glm::transpose(glm::inverse(ViewMatrix * ModelMatrix))));//ç”±äºåœ¨å‡ ä½•ç€è‰²å™¨ä¸­æˆ‘ä»¬ä½¿ç”¨çš„æ˜¯è§‚å¯Ÿç©ºé—´ä¸­åæ ‡è¿›è¡Œè®¡ç®—ï¼Œæ‰€ä»¥ä¸ºäº†æ¶ˆé™¤è§‚å¯Ÿå’Œæ¨¡å‹çŸ©é˜µçš„ç¼©æ”¾å’Œæ—‹è½¬çš„å½±å“ï¼Œè¦å°†æ³•å‘é‡ä¹Ÿå˜æ¢åˆ°è§‚å¯ŸçŸ©é˜µä¸­
+        ModelShader.SetFloat("NormalLength",0.05f);//æ³•çº¿é•¿åº¦
+        //ç»˜åˆ¶
+        PersonModel.Draw(ModelShader);
+    }
 
-    //ÆïÊ¿»æÖÆ
+    //éª‘å£«ç»˜åˆ¶
     void KinghtDraw()
     {
         ModelShader.Use();
-        //²ÄÖÊ
+        //è®¡ç®—
+        //ModelShader.SetFloat("PassedTime",PassedTime);//çˆ†è£‚æ•ˆæœç”¨
+        //æè´¨
         ModelShader.SetInt("SkyBoxTexture", 2);
-        //µã¹âÔ´
+        //ç‚¹å…‰æº
         ModelShader.SetVec3("pointLight.Specular", PointLightColor * glm::vec3(1.0f));
-        //Æ½ĞĞ¹â
+        //å¹³è¡Œå…‰
         ModelShader.SetVec3("directLight.Specular", DirectLightColor * glm::vec3(1.0f));
-        //ÊÖµç¹â
+        //æ‰‹ç”µå…‰
         ModelShader.SetVec3("flashLight.Specular", FlashLightColor * glm::vec3(1.0f));
-        //»æÖÆ
+        //ç»˜åˆ¶
         PersonModel.Draw(ModelShader);
     }
 
-    //½ñÏ«»æÖÆ
+    //ä»Šæ±ç»˜åˆ¶
     void JinXiDraw()
     {
         ModelShader.Use();
-        //»æÖÆ
+        //ç»˜åˆ¶
         PersonModel.Draw(ModelShader);
     }
 
-    //ÆïÊ¿Ãè±ß»æÖÆ
+    //éª‘å£«æè¾¹ç»˜åˆ¶
     void KnightFrameDraw()
     {
-        //ÈôFrameShaderÖ¸Õë²»Îª¿Õ
+        //è‹¥FrameShaderæŒ‡é’ˆä¸ä¸ºç©º
         if (FrameShader)
         {
             FrameShader->Use();
             FrameShader->SetVec3("FrameColor", glm::vec3(1.0f, 0.0f, 0.0f));
-            //»æÖÆ
+            //ç»˜åˆ¶
             Shader shader = *FrameShader;
             PersonModel.Draw(shader);
         }
     }
 
-    //½ñÏ«Ãè±ß»æÖÆ
+    //ä»Šæ±æè¾¹ç»˜åˆ¶
     void JinXiFrameDraw()
     {
-        //ÈôFrameShaderÖ¸Õë²»Îª¿Õ
+        //è‹¥FrameShaderæŒ‡é’ˆä¸ä¸ºç©º
         if (FrameShader)
         {
             FrameShader->Use();
             FrameShader->SetVec3("FrameColor", glm::vec3(0.0f, 0.0f, 1.0f));
-            //»æÖÆ
+            //ç»˜åˆ¶
             Shader shader = *FrameShader;
             PersonModel.Draw(shader);
         }
@@ -173,23 +192,23 @@ public:
 
 
 
-////»ñÈ¡cameraÊôĞÔ
+////è·å–cameraå±æ€§
 //void GetCameraAttrabution(glm::vec3 cameraPos, glm::vec3 cameraFront)
 //{
 //    CameraPos = cameraFront;
 //    CameraFront = cameraFront;
 //}
 //
-////»ñÈ¡¹âÔ´ÊôĞÔ
+////è·å–å…‰æºå±æ€§
 //void GetLightAttribution(glm::vec3 pointLigntPos, glm::vec3 pointLightColor, glm::vec3 directLightDirection, glm::vec3 directLightColor, glm::vec3 flashLightColor, float innerAngle, float outerAngle)
 //{
-//    //µã¹âÔ´
+//    //ç‚¹å…‰æº
 //    PointLightColor = pointLigntPos;
 //    PointLightColor = pointLightColor;
-//    //Æ½ĞĞ¹â
+//    //å¹³è¡Œå…‰
 //    DirectLightDirection = directLightDirection;
 //    DirectLightColor = directLightColor;
-//    //ÊÖµç¹â
+//    //æ‰‹ç”µå…‰
 //    FlashLightColor = flashLightColor;
 //    InnerAngle = innerAngle;
 //    OuterAngle = outerAngle;
