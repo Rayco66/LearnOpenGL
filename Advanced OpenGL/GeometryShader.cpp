@@ -86,655 +86,647 @@ void processInput(GLFWwindow* window);
 
 int main()
 {
-   glfwInit();
-   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-   //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-
-   //创建一个窗口
-   GLFWwindow* window = glfwCreateWindow(WindowWidth, WindowHeight, "LearnOpenGL", NULL, NULL);
-   if (window == NULL)
-   {
-       std::cout << "Failed to create GLFW window" << std::endl;
-       glfwTerminate();
-       return -1;
-   }
-   glfwMakeContextCurrent(window);
-   glfwSetWindowPos(window, WindowPos_X, WindowPos_Y);//设置窗口位置
-
-   //初始化glad
-   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-   {
-       std::cout << "Failed to initialize GLAD" << std::endl;
-       return -1;
-   }
-
-   //设置视口
-   glViewport(0, 0, WindowWidth, WindowHeight);
-
-   //设置渲染模式
-   //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);//线框模式
-   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);//填充模式
-
-   //启用深度测试、模板测试（全局状态，不管是默认帧缓冲还是自建帧缓冲都会启用测试）
-   glEnable(GL_DEPTH_TEST);
-   glDepthFunc(GL_LESS);
-   glEnable(GL_STENCIL_TEST);
-   glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);//模板检测失败时模板值不变，模板检查通过但深度检测失败时模板值替换为参考值，都通过时模板值替换为参考值
-
-   //启用面剔除
-   //glEnable(GL_CULL_FACE);
-
-   //调用窗口大小回调函数
-   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);//每当用户手动调整窗口大小时就会调用回调函数(GLFW会自动检测是否需要调用函数，所以不用写在循环内部)
-   //即使没有这个函数GLFW也允许用户手动调节窗口大小，但不会帮我们调节视口大小和其他相关配置
-
-   //鼠标检测
-   //glfwSetInputMode(window,GLFW_CURSOR,GLFW_CURSOR_DISABLED);
-   glfwSetCursorPosCallback(window, mouse_callback);//glfw自动捕获鼠标位置并传递给mouse_callback
-   glfwSetScrollCallback(window, scroll_callback);//捕获滚轮移动增量并传递给scroll_callback
-
-   //设置着色器
-   //Shader BoxShader("ShaderSource/vShader_Box.glsl", "ShaderSource/fShader_Box.glsl");
-   Shader WallShader("ShaderSource/vShader_Wall.glsl", "ShaderSource/fShader_Wall.glsl");
-   Shader LightBallShader("ShaderSource/vShader_Light.glsl", "ShaderSource/fShader_Light.glsl");
-   Shader GrassShader("ShaderSource/vShader_Grass.glsl", "ShaderSource/fShader_Grass.glsl");
-   Shader WindowShader("ShaderSource/vShader_Window.glsl", "ShaderSource/fShader_Window.glsl");
-   Shader ScreenShader("ShaderSource/vShader_Screen.glsl", "ShaderSource/fShader_Screen.glsl");
-   Shader SkyBoxShader("ShaderSource/vShader_SkyBox.glsl", "ShaderSource/fShader_SkyBox.glsl");
-   Shader ModelShader_Knight("ShaderSource/vShader_Model.glsl", "ShaderSource/fShader_Knight.glsl");//记得把PersonDraw.h中的PassedTime加上
-   Shader ModelShader_JinXi("ShaderSource/vShader_Model.glsl", "ShaderSource/fShader_PersonModel.glsl");
-   Shader FrameShader("ShaderSource/vShader_Frame.glsl", "ShaderSource/fShader_Frame.glsl");
-   Shader NormalShader("ShaderSource/vShader_NormalDisplay.glsl", "ShaderSource/fShader_NormalDisplay.glsl", "ShaderSource/gShader_NormalDisplay.glsl");
-   Shader ExplosionShader_Knight("ShaderSource/vShader_Explosion.glsl", "ShaderSource/fShader_Knight.glsl", "ShaderSource/gShader_Explosion.glsl");
-   Shader DiscoBallShader("ShaderSource/vShader_DiscoBall.glsl", "ShaderSource/fShader_DiscoBall.glsl");
-
-   //设置纹理
-   //unsigned int BoxTexture1 = LoadTexture((std::filesystem::current_path() / "source/Makima.jpg").string().c_str());//确保c++17以上
-   //unsigned int BoxTexture2 = LoadTexture((std::filesystem::current_path()   / "source/Makima3.jpg").string().c_str());
-   unsigned int WallTexture1 = LoadTexture((std::filesystem::current_path() / "source/Wall.png").string().c_str());
-   unsigned int WallTexture2 = LoadTexture((std::filesystem::current_path() / "source/Specular Map.png").string().c_str());
-   unsigned int WallTexture3 = LoadTexture((std::filesystem::current_path() / "source/Code.jpg").string().c_str());
-   unsigned int GrassTexture1 = LoadTexture((std::filesystem::current_path() / "source/grass.png").string().c_str());
-   unsigned int WindowTexture1 = LoadTexture((std::filesystem::current_path() / "source/window.png").string().c_str());
-
-   //设置立方体贴图纹理
-   std::vector<std::string> SkyBoxFaces_Path = {
-       (std::filesystem::current_path() / "source/skybox/skybox/right.jpg").string().c_str(),
-       (std::filesystem::current_path() / "source/skybox/skybox/left.jpg").string().c_str(),
-       (std::filesystem::current_path() / "source/skybox/skybox/top.jpg").string().c_str(),
-       (std::filesystem::current_path() / "source/skybox/skybox/bottom.jpg").string().c_str(),
-       (std::filesystem::current_path() / "source/skybox/skybox/front.jpg").string().c_str(),
-       (std::filesystem::current_path() / "source/skybox/skybox/back.jpg").string().c_str()
-   };
-   unsigned int SkyBoxCMTexture = LoadCubeTexture(SkyBoxFaces_Path);
-
-
-   //网格纹理
-   std::vector<Texture> WallTextures =
-   {
-       {WallTexture1,"DiffuseColorSampler","source/Wall.png"},
-       {WallTexture2,"SpecularColorSampler","source/Specular Map.png"},
-       {WallTexture3,"EmissionColorSampler","source/Code.jpg"}
-   };
-   std::vector<Texture> GrassTextures = {
-       {GrassTexture1,"DiffuseColorSampler","source/grass.png"}
-   };
-   std::vector<Texture> WindowTextures = {
-       {WindowTexture1,"DiffuseColorSampler","source/window.png"}
-   };
-   std::vector<Texture> ScreenTextures = {};
-   std::vector<Texture> SkyBoxTextures = {};
-
-   //加载网格
-   //Mesh BoxMesh(BoxVertices,BoxIndices,BoxTextures);
-   Mesh WallMesh(WallVertices, WallIndices, WallTextures);
-   Mesh GrassMesh(SquareVertices, SquareIndices, GrassTextures);
-   Mesh WindowMesh(SquareVertices, SquareIndices, WindowTextures);
-   Mesh ScreenMesh(ScreenVertices, SquareIndices, ScreenTextures);
-   Mesh SkyBoxMesh(CubeVertices, CubeIndices, SkyBoxTextures);
-
-   //加载模型
-   Model PersonModel_Knight((std::filesystem::current_path() / "source/nanosuit_reflection/nanosuit.obj").string());
-   Model PersonModel_JinXi((std::filesystem::current_path() / "source/JinXi/01.fbx").string());
-   Model LightBallModel((std::filesystem::current_path() / "source/Hollow Sphere/linked_star.obj").string());
-   Model DiscoBallModel((std::filesystem::current_path() / "source/Ball/DiscoBall.fbx").string());
-
-
-
-   //创建帧缓冲
-   unsigned int G_Buffer;
-   glGenFramebuffers(1, &G_Buffer);//创建帧缓冲
-   glBindFramebuffer(GL_FRAMEBUFFER, G_Buffer);//绑定G_Buffer
-   //创建颜色纹理附件
-   unsigned int ColorTexAttachment;
-   glGenTextures(1, &ColorTexAttachment);//创建颜色纹理附件
-   glBindTexture(GL_TEXTURE_2D, ColorTexAttachment);//绑定
-   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WindowWidth, WindowHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);//创建纹理但不初始化
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);//环绕方式
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);//过滤方式
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ColorTexAttachment, 0);//把颜色纹理附件附加到当前绑定的G_Buffer上
-   //创建渲染缓冲对象(深度模板附件)
-   unsigned int RBO;
-   glGenRenderbuffers(1, &RBO);//创建渲染缓冲
-   glBindRenderbuffer(GL_RENDERBUFFER, RBO);//绑定
-   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, WindowWidth, WindowHeight);//为渲染缓冲对象分配存储空间(深度缓冲区24位，模板缓冲区8位)
-   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);//把深度模板附件附加到当前绑定的G_Buffer上
-   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)//检测G_Buffer是否完整
-   {
-       std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
-   }
-   glBindFramebuffer(GL_FRAMEBUFFER, 0);//解绑G_Buffer
-
-
-   //ModelDraw_Person
-   PersonModelDraw Knight(ModelShader_Knight, PersonModel_Knight, &FrameShader);
-   PersonModelDraw JinXi(ModelShader_JinXi, PersonModel_JinXi, &FrameShader);
-   PersonModelDraw Explosion_Knight(ExplosionShader_Knight, PersonModel_Knight);
-   PersonModelDraw Normal(NormalShader, PersonModel_Knight);
-   ObjectModelDrawWL DiscoBall(DiscoBallShader, DiscoBallModel, &FrameShader);
-   ObjectModelDrawNL LightBall(LightBallShader, LightBallModel, &FrameShader);
-
-   //MeshDraw
-   ObjectMeshDrawWL Wall(WallShader, WallMesh);
-   ObjectMeshDrawNL Grass(GrassShader, GrassMesh);
-   ObjectMeshDrawNL Window(WindowShader, WindowMesh);
-   ObjectMeshDrawNL SkyBox(SkyBoxShader, SkyBoxMesh);
-
-
-   //渲染循环
-   while (!glfwWindowShouldClose(window))
-   {
-       //捕获处理输入事件
-       glfwPollEvents();//触发回调函数
-
-       //检查具体输入状态
-       processInput(window);
-
-       //获取每帧时间
-       CurrentTime = (float)glfwGetTime();
-       PeriodTime = CurrentTime - LastTime;
-       if (!IsPaused)
-       {
-           PassedTime += CurrentTime - LastTime;
-       }
-       LastTime = CurrentTime;
-
-       //计算帧率
-       FPSCount++;
-       OneSecond += PeriodTime;
-       if (OneSecond >= 1.0f)
-       {
-           float FPS = (float)FPSCount / OneSecond;
-           std::string Title = "FPS:  " + std::to_string(FPS);
-           glfwSetWindowTitle(window, Title.c_str());
-           OneSecond = 0.0f;
-           FPSCount = 0;
-       }
-
-       //启用帧缓冲
-       glBindFramebuffer(GL_FRAMEBUFFER, G_Buffer);
-
-       //全局状态量设置
-           /*设置窗口背景颜色并在每次循环后重新渲染(清除颜色缓冲和深度缓冲)*/
-       glClearColor(0.678f, 0.847f, 0.902f, 1.0f);
-       glStencilMask(0xFF);//确保模板缓冲区能正常清空
-       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-       //光照设置
-           /*点光源*/
-           //PointLightColor(sin(glfwGetTime() * 1.0f)/2.0f+0.5f,sin(glfwGetTime() * 1.2f)/2.0f+0.5f,sin(glfwGetTime() * 1.5f)/2.0f+0.5f);
-       PointLightColor = glm::vec3(1.0f);//点光源颜色
-       PointLightPos = glm::vec3(0.9f * sin(PassedTime), 0.9f * cos(PassedTime) + 0.5f, sin(PassedTime) + 2.0f);//点光源位置
-       /*平行光*/
-       DirectLightDirection = glm::vec3(1.0f, -1.0f, -1.0f);//平行光方向
-       DirectLightColor = glm::vec3(1.0f);//平行光颜色
-       /*手电光*/
-       FlashLightColor = glm::vec3(0.0f);//手电光颜色
-       InnerAngle = glm::cos(glm::radians(5.0f - rate));//手电光内圈角度（余弦值）
-       OuterAngle = glm::cos(glm::radians(10.0f + rate));//手电光外圈角度（余弦值）
-
-       //变换矩阵
-           /*ViewMatrix*/
-       glm::mat4 view = glm::mat4(1.0f);
-       view = camera.GetViewMatrix();
-       /*PorjectMatrix*/
-       glm::mat4 projection = glm::mat4(1.0f);
-       projection = glm::perspective(glm::radians(FOV), aspectRatio, 0.1f, 100.0f);//视野变小时，物体将占据摄像机（屏幕）更多位置，看起来变得更大
-
-
-       //人物模型绘制
-           /*武士模型绘制*/
-       glActiveTexture(GL_TEXTURE2);
-       glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxCMTexture);
-       //变换矩阵
-       glm::mat4 model_Knight = glm::mat4(1.0f);
-       model_Knight = glm::translate(model_Knight, glm::vec3(0.5f, -1.0f, 1.0f));
-       model_Knight = glm::scale(model_Knight, glm::vec3(0.1f));
-       //模板测试
-       glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-       glStencilFunc(GL_ALWAYS, 0b00000001, 0xFF);//模板检测总是通过，且深度检测也能通过，根据glStencilOp第三个参数，该图形的模板值将被替换为00000001
-       glStencilMask(0b00000001);//将该物体所对应的缓冲区模板值更新为00000001；此时整个模板缓冲区中：该物体所对应位置的模板值为00000001、其余位置为0
-       //绘制
-       Knight.GetMatrix(model_Knight, view, projection);
-       Knight.BasicShaderSet();
-       Knight.KinghtDraw();
-
-
-       /*武士模型法线绘制*/
-       glActiveTexture(GL_TEXTURE2);
-       glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxCMTexture);
-       //变换矩阵
-       glm::mat4 model_Knight2 = glm::mat4(1.0f);
-       model_Knight2 = glm::translate(model_Knight2, glm::vec3(0.5f, -1.0f, 1.0f));
-       model_Knight2 = glm::scale(model_Knight2, glm::vec3(0.1f));
-       //模板测试
-       glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-       glStencilFunc(GL_ALWAYS, 1, 0xFF);//通过检测，不丢弃片段
-       glStencilMask(0x00);//不更新该物体所对应的模板缓冲区//此时整个模板缓冲区中：只有两个model所在位置有非零的模板值，其余部分均为0
-       //法线绘制
-       Normal.GetMatrix(model_Knight, view, projection);
-       Normal.NormalDraw();
-
-
-       /*武士模型爆裂绘制*/
-       glActiveTexture(GL_TEXTURE2);
-       glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxCMTexture);
-       //变换矩阵
-       glm::mat4 model_Knight3 = glm::mat4(1.0f);
-       model_Knight3 = glm::translate(model_Knight3, glm::vec3(1.5f, -1.0f, 1.0f));
-       model_Knight3 = glm::scale(model_Knight3, glm::vec3(0.1f));
-       //模板测试
-       glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-       glStencilFunc(GL_ALWAYS, 1, 0xFF);//通过检测，不丢弃片段
-       glStencilMask(0x00);//不更新该物体所对应的模板缓冲区//此时整个模板缓冲区中：只有两个model所在位置有非零的模板值，其余部分均为0
-       //爆裂效果绘制
-       Explosion_Knight.GetMatrix(model_Knight3, view, projection);
-       Explosion_Knight.BasicShaderSet();
-       Explosion_Knight.KinghtDraw();
-
-
-       /*今汐模型绘制*/
-       //变换矩阵
-       glm::mat4 model_JinXi = glm::mat4(1.0f);
-       model_JinXi = glm::translate(model_JinXi, glm::vec3(-0.5f, -1.0f, 1.0f));
-       model_JinXi = glm::scale(model_JinXi, glm::vec3(0.08f));
-       //模板测试
-       glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-       glStencilFunc(GL_ALWAYS, 0b00000010, 0xFF);
-       glStencilMask(0b00000010);//将该物体所对应的缓冲区模板值更新为00000010//此时整个模板缓冲区中：该model所对应位置的模板值为00000010、另一个model所对应位置为00000001，若两者有重叠部分，则重叠部分为00000011
-       //绘制
-       JinXi.GetMatrix(model_JinXi, view, projection);
-       JinXi.BasicShaderSet();
-       JinXi.JinXiDraw();
-
-
-
-       //物体模型绘制
-           /*Disco球绘制*/
-       glActiveTexture(GL_TEXTURE0);
-       glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxCMTexture);
-       //变换矩阵
-       glm::mat4 model_DiscoBall = glm::mat4(1.0f);
-       model_DiscoBall = glm::translate(model_DiscoBall, glm::vec3(0.0f, 1.0f, 1.0f));
-       model_DiscoBall = glm::scale(model_DiscoBall, glm::vec3(0.005f, 0.005f, 0.005f));
-       model_DiscoBall = glm::rotate(model_DiscoBall, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-       model_DiscoBall = glm::rotate(model_DiscoBall, PassedTime * glm::radians(25.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-       //模板测试
-       glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-       glStencilFunc(GL_ALWAYS, 1, 0xFF);//光源通过检测，不丢弃片段
-       glStencilMask(0x00);//不更新该物体所对应的模板缓冲区//此时整个模板缓冲区中：只有两个model所在位置有非零的模板值，其余部分均为0
-       //绘制
-       DiscoBall.GetMatrix(model_DiscoBall, view, projection);
-       DiscoBall.BasicShaderSet();
-       DiscoBall.DiscoBallDraw();
-
-
-       /*光源绘制*/
-       //变换矩阵
-       glm::mat4 model_LightBall = glm::mat4(1.0f);
-       model_LightBall = glm::translate(model_LightBall, PointLightPos);
-       model_LightBall = glm::scale(model_LightBall, glm::vec3(0.002f, 0.002f, 0.002f));
-       //模板测试
-       glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-       glStencilFunc(GL_ALWAYS, 1, 0xFF);//光源通过检测，不丢弃片段
-       glStencilMask(0x00);//不更新该物体所对应的模板缓冲区//此时整个模板缓冲区中：只有两个model所在位置有非零的模板值，其余部分均为0
-       //绘制
-       LightBall.GetMatrix(model_LightBall, view, projection);
-       LightBall.BasicShaderSet();
-       LightBall.LightBallDraw();
-
-
-
-       //网格物体绘制
-           /*墙体绘制*/
-       glm::mat4 model_Wall = glm::mat4(1.0f);
-       model_Wall = glm::translate(model_Wall, glm::vec3(0.0f, -0.2f, 1.5f));
-       model_Wall = glm::scale(model_Wall, glm::vec3(1.5f));
-       //模板测试
-       glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-       glStencilFunc(GL_ALWAYS, 1, 0xFF);//墙壁通过检测，不丢弃片段
-       glStencilMask(0x00);//不更新该物体所对应的模板缓冲区//此时整个模板缓冲区中：只有两个model所在位置有非零的模板值，其余部分均为0
-       //绘制
-       Wall.GetMatrix(model_Wall, view, projection);
-       Wall.BasicShaderSet();
-       Wall.WallDraw();
-
-
-       /*环境绘制*/
-       if (IsKey_E)
-       {
-           /*草地*/
-           //对于全透明物体(草纹理的边框)：不需要混合测试，直接丢弃相应透明度的片段即可
-           glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-           glStencilFunc(GL_ALWAYS, 1, 0xFF);//通过检测，不丢弃片段
-           glStencilMask(0x00);//不更新该物体所对应的模板缓冲区
-           std::vector<glm::vec3> vegetation;
-           vegetation.push_back(glm::vec3(-0.7f, -0.5f, 1.0f));
-           vegetation.push_back(glm::vec3(0.7f, -0.5f, 1.0f));
-           vegetation.push_back(glm::vec3(0.0f, -0.5f, 1.0f));
-
-           glm::mat4 model_Grass = glm::mat4(1.0f);
-
-           for (unsigned int i = 0; i < vegetation.size(); i++)
-           {
-               model_Grass = glm::mat4(1.0f);
-               model_Grass = glm::translate(model_Grass, vegetation[i]);
-               Grass.GetMatrix(model_Grass, view, projection);
-               Grass.BasicShaderSet();
-               Grass.GrassDraw();
-           }
-
-           /*窗户*/
-           //对于半透明物体：使用混合测试，确保先渲染不透明的物体再渲染半透明的物体，先渲染远处的半透明物体再渲染近处的半透明物体
-           glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-           glStencilFunc(GL_ALWAYS, 1, 0xFF);//通过检测，不丢弃片段
-           glStencilMask(0x00);//不更新该物体所对应的模板缓冲区
-           glEnable(GL_BLEND);//启用混合
-           glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-           std::vector<glm::vec3> vegetation2;
-           vegetation2.push_back(glm::vec3(-0.35f, -0.5f, 1.0f));
-           vegetation2.push_back(glm::vec3(0.35f, -0.5f, 1.5f));
-           vegetation2.push_back(glm::vec3(0.0f, -0.5f, 2.0f));
-           std::map<float, glm::vec3> Sorted;
-           for (unsigned int i = 0; i < vegetation2.size(); i++)
-           {
-               float distence = glm::length(CameraPos - vegetation2[i]);
-               Sorted[distence] = vegetation2[i];
-           }
-           glm::mat4 model_Window = glm::mat4(1.0f);
-
-           for (auto it = Sorted.rbegin(); it != Sorted.rend(); ++it)
-           {
-               model_Window = glm::mat4(1.0f);
-               model_Window = glm::translate(model_Window, it->second);
-               Window.GetMatrix(model_Window, view, projection);
-               Window.BasicShaderSet();
-               Window.GrassDraw();
-           }
-           glDisable(GL_BLEND);
-       }
-
-       /*天空盒*/
-       glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-       glStencilFunc(GL_ALWAYS, 1, 0xFF);//通过模板检测
-       glStencilMask(0x00);//不更新该物体所对应的模板缓冲区
-       glDepthFunc(GL_LEQUAL);//深度值小于等于深度缓冲区的片段被保留(已经渲染过其他物体的位置的天空盒片段被丢弃，尚未渲染过其他物体的位置通过深度检测，相应深度缓冲区被设为1.0(但这些地方本来就是1.0因为深度缓冲区默认值为1.0))
-       glActiveTexture(GL_TEXTURE0);
-       glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxCMTexture);
-       SkyBox.GetMatrix(glm::mat4(1.0f), glm::mat4(glm::mat3(view)), projection);//去除view矩阵中的平移部分，即摄像机始终处于坐标原点(移动时也是)
-       SkyBox.BasicShaderSet();
-       SkyBox.GrassDraw();
-       glDepthFunc(GL_LESS);//重新设置深度检测函数为LESS通过
-
-
-
-       //边框绘制
-       if (IsKey_F)
-       {
-           /*武士边框绘制*/
-           //变换矩阵
-           glm::mat4 Fmodel_Knight = glm::mat4(1.0f);
-           Fmodel_Knight = glm::translate(Fmodel_Knight, glm::vec3(0.5f, -1.0f, 1.0f));
-           Fmodel_Knight = glm::scale(Fmodel_Knight, glm::vec3(0.1001f));//轮廓的缩放倍数需要只比模型的缩放倍数大一点点即可
-           //模板检测
-           glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-           glStencilFunc(GL_NOTEQUAL, 0b00000001, 0b00000001);//两个model对应位置的模板值分别为00000001、00000010，重叠部分为00000011，凡是第一位不等于1的均被丢弃，故只有该model的边框能通过检测
-           glStencilMask(0x00);//不更新该物体所对应的模板缓冲区//此时整个模板缓冲区中：只有两个model所在位置有非零的模板值，其余部分均为0
-           //深度检测
-           glDisable(GL_DEPTH_TEST);//暂时禁用深度检测，使边框永远能通过深度检测
-           //绘制
-           Knight.GetFMatrix(Fmodel_Knight);
-           Knight.BasicFShaderSet();
-           Knight.KnightFrameDraw();
-           //恢复深度检测
-           glEnable(GL_DEPTH_TEST);
-
-
-           /*今夕边框绘制*/
-           //变换矩阵
-           glm::mat4 Fmodel_JinXi = glm::mat4(1.0f);
-           Fmodel_JinXi = glm::translate(Fmodel_JinXi, glm::vec3(-0.5f, -1.0f, 1.0f));
-           Fmodel_JinXi = glm::scale(Fmodel_JinXi, glm::vec3(0.0801f));
-           //模板检测
-           glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-           glStencilFunc(GL_NOTEQUAL, 0b00000010, 0b00000010);//两个model对应位置的模板值分别为00000001、00000010，重叠部分为00000011，凡是第二位不等于1的均被丢弃，故只有该model的边框能通过检测
-           glStencilMask(0x00);//不更新该物体所对应的模板缓冲区//此时整个模板缓冲区中：只有两个model所在位置有非零的模板值，其余部分均为0
-           //深度检测
-           glDisable(GL_DEPTH_TEST);//暂时禁用深度检测，使边框永远能通过深度检测
-           //绘制
-           JinXi.GetFMatrix(Fmodel_JinXi);
-           JinXi.BasicFShaderSet();
-           JinXi.JinXiFrameDraw();
-           //恢复深度检测
-           glEnable(GL_DEPTH_TEST);
-       }
-
-
-       //屏幕绘制
-       glBindFramebuffer(GL_FRAMEBUFFER, 0);//解绑G_Buffer，恢复到默认帧缓冲
-       glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-       glStencilFunc(GL_ALWAYS, 1, 0xFF);//通过检测，不丢弃片段
-       glStencilMask(0x00);//不更新该物体所对应的模板缓冲区
-       glDisable(GL_DEPTH_TEST);//需要暂时禁用深度检测，因为我们希望只及将带有ColorTexAttachment纹理的ScreenMesh绘制到屏幕上，所以不需要深度检测
-       glClearColor(1.0f, 1.0f, 1.0f, 1.0f);//没被ScreenMesh渲染的地方将会是白色的
-       glClear(GL_COLOR_BUFFER_BIT);
-
-       ScreenShader.Use();
-       glActiveTexture(GL_TEXTURE0);
-       glBindTexture(GL_TEXTURE_2D, ColorTexAttachment);//将ColorTexAttachment绑定到GL_TEXTURE0上
-       float SharpenKernel[9] = {
-           -1,-1,-1,
-           -1, 9,-1,
-           -1,-1,-1
-       };//锐化卷积核
-       float BlurKernel[9] = {
-           1.0 / 16.0, 2.0 / 16.0, 1.0 / 16.0,
-           2.0 / 16.0, 4.0 / 16.0, 2.0 / 16.0,
-           1.0 / 16.0, 2.0 / 16.0, 1.0 / 16.0
-       };//模糊卷积核
-       float NoKernel[9] = {
-           0.0, 0.0, 0.0,
-           0.0, 1.0, 0.0,
-           0.0, 0.0, 0.0
-       };//不使用任何核效果
-
-       //主屏幕
-       glm::mat4 model_Screen = glm::mat4(1.0f);
-       ScreenShader.setMat4("model", model_Screen);
-       ScreenShader.SetBool("IfKernel", false);
-       ScreenShader.SetBool("IfGray", false);
-       ScreenShader.SetBool("IfInverse", false);
-       ScreenShader.SetInt("ScreenTexture", 0);
-       ScreenMesh.Draw(ScreenShader);
-
-       //副屏幕
-       if (IsKey_M)
-       {
-           glm::mat4 model_Screen1 = glm::mat4(1.0f);
-           model_Screen1 = glm::scale(model_Screen1, glm::vec3(0.25));
-           model_Screen1 = glm::translate(model_Screen1, glm::vec3(-2.95f, -3.0f, 0.0f));
-           ScreenShader.setMat4("model", model_Screen1);
-           ScreenShader.SetBool("IfKernel", true);
-           ScreenShader.SetBool("IfGray", false);
-           ScreenShader.SetBool("IfInverse", false);
-           ScreenShader.SetFloatArray("Kernel", SharpenKernel, 9);
-           ScreenShader.SetInt("ScreenTexture", 0);
-           ScreenMesh.Draw(ScreenShader);
-       }
-       glEnable(GL_DEPTH_TEST);//恢复深度检测
-
-
-       //交换缓冲区
-       glfwSwapBuffers(window);
-   }
-
-   //清理
-   glfwTerminate();
-   return 0;
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
+    //创建一个窗口
+    GLFWwindow* window = glfwCreateWindow(WindowWidth, WindowHeight, "LearnOpenGL", NULL, NULL);
+    if (window == NULL)
+    {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
+    glfwMakeContextCurrent(window);
+    glfwSetWindowPos(window, WindowPos_X, WindowPos_Y);//设置窗口位置
+
+    //初始化glad
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+    {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return -1;
+    }
+
+    //设置视口
+    glViewport(0, 0, WindowWidth, WindowHeight);
+
+    //设置渲染模式
+    //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);//线框模式
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);//填充模式
+
+    //启用深度测试、模板测试（全局状态，不管是默认帧缓冲还是自建帧缓冲都会启用测试）
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);//模板检测失败时模板值不变，模板检查通过但深度检测失败时模板值替换为参考值，都通过时模板值替换为参考值
+
+    //启用面剔除
+    //glEnable(GL_CULL_FACE);
+
+    //调用窗口大小回调函数
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);//每当用户手动调整窗口大小时就会调用回调函数(GLFW会自动检测是否需要调用函数，所以不用写在循环内部)
+    //即使没有这个函数GLFW也允许用户手动调节窗口大小，但不会帮我们调节视口大小和其他相关配置
+
+    //鼠标检测
+    //glfwSetInputMode(window,GLFW_CURSOR,GLFW_CURSOR_DISABLED);
+    glfwSetCursorPosCallback(window, mouse_callback);//glfw自动捕获鼠标位置并传递给mouse_callback
+    glfwSetScrollCallback(window, scroll_callback);//捕获滚轮移动增量并传递给scroll_callback
+
+    //设置着色器
+    //Shader BoxShader("ShaderSource/vShader_Box.glsl", "ShaderSource/fShader_Box.glsl");
+    Shader WallShader("ShaderSource/vShader_Wall.glsl", "ShaderSource/fShader_Wall.glsl");
+    Shader LightBallShader("ShaderSource/vShader_Light.glsl", "ShaderSource/fShader_Light.glsl");
+    Shader GrassShader("ShaderSource/vShader_Grass.glsl", "ShaderSource/fShader_Grass.glsl");
+    Shader WindowShader("ShaderSource/vShader_Window.glsl", "ShaderSource/fShader_Window.glsl");
+    Shader ScreenShader("ShaderSource/vShader_Screen.glsl", "ShaderSource/fShader_Screen.glsl");
+    Shader SkyBoxShader("ShaderSource/vShader_SkyBox.glsl", "ShaderSource/fShader_SkyBox.glsl");
+    Shader ModelShader_Knight("ShaderSource/vShader_Model.glsl", "ShaderSource/fShader_Knight.glsl");//记得把PersonDraw.h中的PassedTime加上
+    Shader ModelShader_JinXi("ShaderSource/vShader_Model.glsl", "ShaderSource/fShader_PersonModel.glsl");
+    Shader FrameShader("ShaderSource/vShader_Frame.glsl", "ShaderSource/fShader_Frame.glsl");
+    Shader NormalShader("ShaderSource/vShader_NormalDisplay.glsl", "ShaderSource/fShader_NormalDisplay.glsl", "ShaderSource/gShader_NormalDisplay.glsl");
+    Shader ExplosionShader_Knight("ShaderSource/vShader_Explosion.glsl", "ShaderSource/fShader_Knight.glsl", "ShaderSource/gShader_Explosion.glsl");
+    Shader DiscoBallShader("ShaderSource/vShader_DiscoBall.glsl", "ShaderSource/fShader_DiscoBall.glsl");
+
+    //设置纹理
+    //unsigned int BoxTexture1 = LoadTexture((std::filesystem::current_path() / "source/Makima.jpg").string().c_str());//确保c++17以上
+    //unsigned int BoxTexture2 = LoadTexture((std::filesystem::current_path()   / "source/Makima3.jpg").string().c_str());
+    unsigned int WallTexture1 = LoadTexture((std::filesystem::current_path() / "source/Wall.png").string().c_str());
+    unsigned int WallTexture2 = LoadTexture((std::filesystem::current_path() / "source/Specular Map.png").string().c_str());
+    unsigned int WallTexture3 = LoadTexture((std::filesystem::current_path() / "source/Code.jpg").string().c_str());
+    unsigned int GrassTexture1 = LoadTexture((std::filesystem::current_path() / "source/grass.png").string().c_str());
+    unsigned int WindowTexture1 = LoadTexture((std::filesystem::current_path() / "source/window.png").string().c_str());
+
+    //设置立方体贴图纹理
+    std::vector<std::string> SkyBoxFaces_Path = {
+        (std::filesystem::current_path() / "source/skybox/skybox/right.jpg").string().c_str(),
+        (std::filesystem::current_path() / "source/skybox/skybox/left.jpg").string().c_str(),
+        (std::filesystem::current_path() / "source/skybox/skybox/top.jpg").string().c_str(),
+        (std::filesystem::current_path() / "source/skybox/skybox/bottom.jpg").string().c_str(),
+        (std::filesystem::current_path() / "source/skybox/skybox/front.jpg").string().c_str(),
+        (std::filesystem::current_path() / "source/skybox/skybox/back.jpg").string().c_str()
+    };
+    unsigned int SkyBoxCMTexture = LoadCubeTexture(SkyBoxFaces_Path);
+
+
+    //网格纹理
+    std::vector<Texture> WallTextures =
+    {
+        {WallTexture1,"DiffuseColorSampler","source/Wall.png"},
+        {WallTexture2,"SpecularColorSampler","source/Specular Map.png"},
+        {WallTexture3,"EmissionColorSampler","source/Code.jpg"}
+    };
+    std::vector<Texture> GrassTextures = {
+        {GrassTexture1,"DiffuseColorSampler","source/grass.png"}
+    };
+    std::vector<Texture> WindowTextures = {
+        {WindowTexture1,"DiffuseColorSampler","source/window.png"}
+    };
+    std::vector<Texture> ScreenTextures = {};
+    std::vector<Texture> SkyBoxTextures = {};
+
+    //加载网格
+    //Mesh BoxMesh(BoxVertices,BoxIndices,BoxTextures);
+    Mesh WallMesh(WallVertices, WallIndices, WallTextures);
+    Mesh GrassMesh(SquareVertices, SquareIndices, GrassTextures);
+    Mesh WindowMesh(SquareVertices, SquareIndices, WindowTextures);
+    Mesh ScreenMesh(ScreenVertices, SquareIndices, ScreenTextures);
+    Mesh SkyBoxMesh(CubeVertices, CubeIndices, SkyBoxTextures);
+
+    //加载模型
+    Model PersonModel_Knight((std::filesystem::current_path() / "source/nanosuit_reflection/nanosuit.obj").string());
+    Model PersonModel_JinXi((std::filesystem::current_path() / "source/JinXi/01.fbx").string());
+    Model LightBallModel((std::filesystem::current_path() / "source/Hollow Sphere/linked_star.obj").string());
+    Model DiscoBallModel((std::filesystem::current_path() / "source/Ball/DiscoBall.fbx").string());
+
+
+
+    //创建帧缓冲
+    unsigned int G_Buffer;
+    glGenFramebuffers(1, &G_Buffer);//创建帧缓冲
+    glBindFramebuffer(GL_FRAMEBUFFER, G_Buffer);//绑定G_Buffer
+    //创建颜色纹理附件
+    unsigned int ColorTexAttachment;
+    glGenTextures(1, &ColorTexAttachment);//创建颜色纹理附件
+    glBindTexture(GL_TEXTURE_2D, ColorTexAttachment);//绑定
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WindowWidth, WindowHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);//创建纹理但不初始化
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);//环绕方式
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);//过滤方式
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ColorTexAttachment, 0);//把颜色纹理附件附加到当前绑定的G_Buffer上
+    //创建渲染缓冲对象(深度模板附件)
+    unsigned int RBO;
+    glGenRenderbuffers(1, &RBO);//创建渲染缓冲
+    glBindRenderbuffer(GL_RENDERBUFFER, RBO);//绑定
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, WindowWidth, WindowHeight);//为渲染缓冲对象分配存储空间(深度缓冲区24位，模板缓冲区8位)
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);//把深度模板附件附加到当前绑定的G_Buffer上
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)//检测G_Buffer是否完整
+    {
+        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);//解绑G_Buffer
+
+
+    //ModelDraw_Person
+    PersonModelDraw Knight(ModelShader_Knight, PersonModel_Knight, &FrameShader);
+    PersonModelDraw JinXi(ModelShader_JinXi, PersonModel_JinXi, &FrameShader);
+    PersonModelDraw Explosion_Knight(ExplosionShader_Knight, PersonModel_Knight);
+    PersonModelDraw Normal(NormalShader, PersonModel_Knight);
+    ObjectModelDrawWL DiscoBall(DiscoBallShader, DiscoBallModel, &FrameShader);
+    ObjectModelDrawNL LightBall(LightBallShader, LightBallModel, &FrameShader);
+
+    //MeshDraw
+    ObjectMeshDrawWL Wall(WallShader, WallMesh);
+    ObjectMeshDrawNL Grass(GrassShader, GrassMesh);
+    ObjectMeshDrawNL Window(WindowShader, WindowMesh);
+    ObjectMeshDrawNL SkyBox(SkyBoxShader, SkyBoxMesh);
+
+
+    //渲染循环
+    while (!glfwWindowShouldClose(window))
+    {
+        //捕获处理输入事件
+        glfwPollEvents();//触发回调函数
+
+        //检查具体输入状态
+        processInput(window);
+
+        //获取每帧时间
+        CurrentTime = (float)glfwGetTime();
+        PeriodTime = CurrentTime - LastTime;
+        if (!IsPaused)
+        {
+            PassedTime += CurrentTime - LastTime;
+        }
+        LastTime = CurrentTime;
+
+        //计算帧率
+        FPSCount++;
+        OneSecond += PeriodTime;
+        if (OneSecond >= 1.0f)
+        {
+            float FPS = (float)FPSCount / OneSecond;
+            std::string Title = "FPS:  " + std::to_string(FPS);
+            glfwSetWindowTitle(window, Title.c_str());
+            OneSecond = 0.0f;
+            FPSCount = 0;
+        }
+
+        //启用帧缓冲
+        glBindFramebuffer(GL_FRAMEBUFFER, G_Buffer);
+
+        //全局状态量设置
+            /*设置窗口背景颜色并在每次循环后重新渲染(清除颜色缓冲和深度缓冲)*/
+        glClearColor(0.678f, 0.847f, 0.902f, 1.0f);
+        glStencilMask(0xFF);//确保模板缓冲区能正常清空
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+        //光照设置
+            /*点光源*/
+            //PointLightColor(sin(glfwGetTime() * 1.0f)/2.0f+0.5f,sin(glfwGetTime() * 1.2f)/2.0f+0.5f,sin(glfwGetTime() * 1.5f)/2.0f+0.5f);
+        PointLightColor = glm::vec3(1.0f);//点光源颜色
+        PointLightPos = glm::vec3(0.9f * sin(PassedTime), 0.9f * cos(PassedTime) + 0.5f, sin(PassedTime) + 2.0f);//点光源位置
+        /*平行光*/
+        DirectLightDirection = glm::vec3(1.0f, -1.0f, -1.0f);//平行光方向
+        DirectLightColor = glm::vec3(1.0f);//平行光颜色
+        /*手电光*/
+        FlashLightColor = glm::vec3(0.0f);//手电光颜色
+        InnerAngle = glm::cos(glm::radians(5.0f - rate));//手电光内圈角度（余弦值）
+        OuterAngle = glm::cos(glm::radians(10.0f + rate));//手电光外圈角度（余弦值）
+
+        //变换矩阵
+            /*ViewMatrix*/
+        glm::mat4 view = glm::mat4(1.0f);
+        view = camera.GetViewMatrix();
+        /*PorjectMatrix*/
+        glm::mat4 projection = glm::mat4(1.0f);
+        projection = glm::perspective(glm::radians(FOV), aspectRatio, 0.1f, 100.0f);//视野变小时，物体将占据摄像机（屏幕）更多位置，看起来变得更大
+
+
+        //人物模型绘制
+            /*武士模型绘制*/
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxCMTexture);
+        //变换矩阵
+        glm::mat4 model_Knight = glm::mat4(1.0f);
+        model_Knight = glm::translate(model_Knight, glm::vec3(0.5f, -1.0f, 1.0f));
+        model_Knight = glm::scale(model_Knight, glm::vec3(0.1f));
+        //模板测试
+        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 0b00000001, 0xFF);//模板检测总是通过，且深度检测也能通过，根据glStencilOp第三个参数，该图形的模板值将被替换为00000001
+        glStencilMask(0b00000001);//将该物体所对应的缓冲区模板值更新为00000001；此时整个模板缓冲区中：该物体所对应位置的模板值为00000001、其余位置为0
+        //绘制
+        Knight.GetMatrix(model_Knight, view, projection);
+        Knight.BasicShaderSet();
+        Knight.KinghtDraw();
+           /*武士模型法线绘制*/
+        //模板测试
+        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);//通过检测，不丢弃片段
+        glStencilMask(0x00);//不更新该物体所对应的模板缓冲区//此时整个模板缓冲区中：只有两个model所在位置有非零的模板值，其余部分均为0
+        //法线绘制
+        Normal.GetMatrix(model_Knight, view, projection);
+        Normal.NormalDraw();
+
+
+        /*武士模型爆裂绘制*/
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxCMTexture);
+        //变换矩阵
+        glm::mat4 model_Knight3 = glm::mat4(1.0f);
+        model_Knight3 = glm::translate(model_Knight3, glm::vec3(1.5f, -1.0f, 1.0f));
+        model_Knight3 = glm::scale(model_Knight3, glm::vec3(0.1f));
+        //模板测试
+        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);//通过检测，不丢弃片段
+        glStencilMask(0x00);//不更新该物体所对应的模板缓冲区//此时整个模板缓冲区中：只有两个model所在位置有非零的模板值，其余部分均为0
+        //爆裂效果绘制
+        Explosion_Knight.GetMatrix(model_Knight3, view, projection);
+        Explosion_Knight.BasicShaderSet();
+        Explosion_Knight.KinghtDraw();
+
+
+        /*今汐模型绘制*/
+        //变换矩阵
+        glm::mat4 model_JinXi = glm::mat4(1.0f);
+        model_JinXi = glm::translate(model_JinXi, glm::vec3(-0.5f, -1.0f, 1.0f));
+        model_JinXi = glm::scale(model_JinXi, glm::vec3(0.08f));
+        //模板测试
+        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 0b00000010, 0xFF);
+        glStencilMask(0b00000010);//将该物体所对应的缓冲区模板值更新为00000010//此时整个模板缓冲区中：该model所对应位置的模板值为00000010、另一个model所对应位置为00000001，若两者有重叠部分，则重叠部分为00000011
+        //绘制
+        JinXi.GetMatrix(model_JinXi, view, projection);
+        JinXi.BasicShaderSet();
+        JinXi.JinXiDraw();
+
+
+
+        //物体模型绘制
+            /*Disco球绘制*/
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxCMTexture);
+        //变换矩阵
+        glm::mat4 model_DiscoBall = glm::mat4(1.0f);
+        model_DiscoBall = glm::translate(model_DiscoBall, glm::vec3(0.0f, 1.0f, 1.0f));
+        model_DiscoBall = glm::scale(model_DiscoBall, glm::vec3(0.005f, 0.005f, 0.005f));
+        model_DiscoBall = glm::rotate(model_DiscoBall, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        model_DiscoBall = glm::rotate(model_DiscoBall, PassedTime * glm::radians(25.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        //模板测试
+        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);//光源通过检测，不丢弃片段
+        glStencilMask(0x00);//不更新该物体所对应的模板缓冲区//此时整个模板缓冲区中：只有两个model所在位置有非零的模板值，其余部分均为0
+        //绘制
+        DiscoBall.GetMatrix(model_DiscoBall, view, projection);
+        DiscoBall.BasicShaderSet();
+        DiscoBall.DiscoBallDraw();
+
+
+        /*光源绘制*/
+        //变换矩阵
+        glm::mat4 model_LightBall = glm::mat4(1.0f);
+        model_LightBall = glm::translate(model_LightBall, PointLightPos);
+        model_LightBall = glm::scale(model_LightBall, glm::vec3(0.002f, 0.002f, 0.002f));
+        //模板测试
+        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);//光源通过检测，不丢弃片段
+        glStencilMask(0x00);//不更新该物体所对应的模板缓冲区//此时整个模板缓冲区中：只有两个model所在位置有非零的模板值，其余部分均为0
+        //绘制
+        LightBall.GetMatrix(model_LightBall, view, projection);
+        LightBall.BasicShaderSet();
+        LightBall.LightBallDraw();
+
+
+
+        //网格物体绘制
+            /*墙体绘制*/
+        glm::mat4 model_Wall = glm::mat4(1.0f);
+        model_Wall = glm::translate(model_Wall, glm::vec3(0.0f, -0.2f, 1.5f));
+        model_Wall = glm::scale(model_Wall, glm::vec3(1.5f));
+        //模板测试
+        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);//墙壁通过检测，不丢弃片段
+        glStencilMask(0x00);//不更新该物体所对应的模板缓冲区//此时整个模板缓冲区中：只有两个model所在位置有非零的模板值，其余部分均为0
+        //绘制
+        Wall.GetMatrix(model_Wall, view, projection);
+        Wall.BasicShaderSet();
+        Wall.WallDraw();
+
+
+        /*环境绘制*/
+        if (IsKey_E)
+        {
+            /*草地*/
+            //对于全透明物体(草纹理的边框)：不需要混合测试，直接丢弃相应透明度的片段即可
+            glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+            glStencilFunc(GL_ALWAYS, 1, 0xFF);//通过检测，不丢弃片段
+            glStencilMask(0x00);//不更新该物体所对应的模板缓冲区
+            std::vector<glm::vec3> vegetation;
+            vegetation.push_back(glm::vec3(-0.7f, -0.5f, 1.0f));
+            vegetation.push_back(glm::vec3(0.7f, -0.5f, 1.0f));
+            vegetation.push_back(glm::vec3(0.0f, -0.5f, 1.0f));
+
+            glm::mat4 model_Grass = glm::mat4(1.0f);
+
+            for (unsigned int i = 0; i < vegetation.size(); i++)
+            {
+                model_Grass = glm::mat4(1.0f);
+                model_Grass = glm::translate(model_Grass, vegetation[i]);
+                Grass.GetMatrix(model_Grass, view, projection);
+                Grass.BasicShaderSet();
+                Grass.GrassDraw();
+            }
+
+            /*窗户*/
+            //对于半透明物体：使用混合测试，确保先渲染不透明的物体再渲染半透明的物体，先渲染远处的半透明物体再渲染近处的半透明物体
+            glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+            glStencilFunc(GL_ALWAYS, 1, 0xFF);//通过检测，不丢弃片段
+            glStencilMask(0x00);//不更新该物体所对应的模板缓冲区
+            glEnable(GL_BLEND);//启用混合
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            std::vector<glm::vec3> vegetation2;
+            vegetation2.push_back(glm::vec3(-0.35f, -0.5f, 1.0f));
+            vegetation2.push_back(glm::vec3(0.35f, -0.5f, 1.5f));
+            vegetation2.push_back(glm::vec3(0.0f, -0.5f, 2.0f));
+            std::map<float, glm::vec3> Sorted;
+            for (unsigned int i = 0; i < vegetation2.size(); i++)
+            {
+                float distence = glm::length(CameraPos - vegetation2[i]);
+                Sorted[distence] = vegetation2[i];
+            }
+            glm::mat4 model_Window = glm::mat4(1.0f);
+
+            for (auto it = Sorted.rbegin(); it != Sorted.rend(); ++it)
+            {
+                model_Window = glm::mat4(1.0f);
+                model_Window = glm::translate(model_Window, it->second);
+                Window.GetMatrix(model_Window, view, projection);
+                Window.BasicShaderSet();
+                Window.GrassDraw();
+            }
+            glDisable(GL_BLEND);
+        }
+
+        /*天空盒*/
+        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);//通过模板检测
+        glStencilMask(0x00);//不更新该物体所对应的模板缓冲区
+        glDepthFunc(GL_LEQUAL);//深度值小于等于深度缓冲区的片段被保留(已经渲染过其他物体的位置的天空盒片段被丢弃，尚未渲染过其他物体的位置通过深度检测，相应深度缓冲区被设为1.0(但这些地方本来就是1.0因为深度缓冲区默认值为1.0))
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxCMTexture);
+        SkyBox.GetMatrix(glm::mat4(1.0f), glm::mat4(glm::mat3(view)), projection);//去除view矩阵中的平移部分，即摄像机始终处于坐标原点(移动时也是)
+        SkyBox.BasicShaderSet();
+        SkyBox.GrassDraw();
+        glDepthFunc(GL_LESS);//重新设置深度检测函数为LESS通过
+
+
+
+        //边框绘制
+        if (IsKey_F)
+        {
+            /*武士边框绘制*/
+            //变换矩阵
+            glm::mat4 Fmodel_Knight = glm::mat4(1.0f);
+            Fmodel_Knight = glm::translate(Fmodel_Knight, glm::vec3(0.5f, -1.0f, 1.0f));
+            Fmodel_Knight = glm::scale(Fmodel_Knight, glm::vec3(0.1001f));//轮廓的缩放倍数需要只比模型的缩放倍数大一点点即可
+            //模板检测
+            glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+            glStencilFunc(GL_NOTEQUAL, 0b00000001, 0b00000001);//两个model对应位置的模板值分别为00000001、00000010，重叠部分为00000011，凡是第一位不等于1的均被丢弃，故只有该model的边框能通过检测
+            glStencilMask(0x00);//不更新该物体所对应的模板缓冲区//此时整个模板缓冲区中：只有两个model所在位置有非零的模板值，其余部分均为0
+            //深度检测
+            glDisable(GL_DEPTH_TEST);//暂时禁用深度检测，使边框永远能通过深度检测
+            //绘制
+            Knight.GetFMatrix(Fmodel_Knight);
+            Knight.BasicFShaderSet();
+            Knight.KnightFrameDraw();
+            //恢复深度检测
+            glEnable(GL_DEPTH_TEST);
+
+
+            /*今夕边框绘制*/
+            //变换矩阵
+            glm::mat4 Fmodel_JinXi = glm::mat4(1.0f);
+            Fmodel_JinXi = glm::translate(Fmodel_JinXi, glm::vec3(-0.5f, -1.0f, 1.0f));
+            Fmodel_JinXi = glm::scale(Fmodel_JinXi, glm::vec3(0.0801f));
+            //模板检测
+            glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+            glStencilFunc(GL_NOTEQUAL, 0b00000010, 0b00000010);//两个model对应位置的模板值分别为00000001、00000010，重叠部分为00000011，凡是第二位不等于1的均被丢弃，故只有该model的边框能通过检测
+            glStencilMask(0x00);//不更新该物体所对应的模板缓冲区//此时整个模板缓冲区中：只有两个model所在位置有非零的模板值，其余部分均为0
+            //深度检测
+            glDisable(GL_DEPTH_TEST);//暂时禁用深度检测，使边框永远能通过深度检测
+            //绘制
+            JinXi.GetFMatrix(Fmodel_JinXi);
+            JinXi.BasicFShaderSet();
+            JinXi.JinXiFrameDraw();
+            //恢复深度检测
+            glEnable(GL_DEPTH_TEST);
+        }
+
+
+        //屏幕绘制
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);//解绑G_Buffer，恢复到默认帧缓冲
+        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);//通过检测，不丢弃片段
+        glStencilMask(0x00);//不更新该物体所对应的模板缓冲区
+        glDisable(GL_DEPTH_TEST);//需要暂时禁用深度检测，因为我们希望只及将带有ColorTexAttachment纹理的ScreenMesh绘制到屏幕上，所以不需要深度检测
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);//没被ScreenMesh渲染的地方将会是白色的
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        ScreenShader.Use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, ColorTexAttachment);//将ColorTexAttachment绑定到GL_TEXTURE0上
+        float SharpenKernel[9] = {
+            -1,-1,-1,
+            -1, 9,-1,
+            -1,-1,-1
+        };//锐化卷积核
+        float BlurKernel[9] = {
+            1.0 / 16.0, 2.0 / 16.0, 1.0 / 16.0,
+            2.0 / 16.0, 4.0 / 16.0, 2.0 / 16.0,
+            1.0 / 16.0, 2.0 / 16.0, 1.0 / 16.0
+        };//模糊卷积核
+        float NoKernel[9] = {
+            0.0, 0.0, 0.0,
+            0.0, 1.0, 0.0,
+            0.0, 0.0, 0.0
+        };//不使用任何核效果
+
+        //主屏幕
+        glm::mat4 model_Screen = glm::mat4(1.0f);
+        ScreenShader.setMat4("model", model_Screen);
+        ScreenShader.SetBool("IfKernel", false);
+        ScreenShader.SetBool("IfGray", false);
+        ScreenShader.SetBool("IfInverse", false);
+        ScreenShader.SetInt("ScreenTexture", 0);
+        ScreenMesh.Draw(ScreenShader);
+
+        //副屏幕
+        if (IsKey_M)
+        {
+            glm::mat4 model_Screen1 = glm::mat4(1.0f);
+            model_Screen1 = glm::scale(model_Screen1, glm::vec3(0.25));
+            model_Screen1 = glm::translate(model_Screen1, glm::vec3(-2.95f, -3.0f, 0.0f));
+            ScreenShader.setMat4("model", model_Screen1);
+            ScreenShader.SetBool("IfKernel", true);
+            ScreenShader.SetBool("IfGray", false);
+            ScreenShader.SetBool("IfInverse", false);
+            ScreenShader.SetFloatArray("Kernel", SharpenKernel, 9);
+            ScreenShader.SetInt("ScreenTexture", 0);
+            ScreenMesh.Draw(ScreenShader);
+        }
+        glEnable(GL_DEPTH_TEST);//恢复深度检测
+
+
+        //交换缓冲区
+        glfwSwapBuffers(window);
+    }
+
+    //清理
+    glfwTerminate();
+    return 0;
 }
 
 
 //窗口大小回调函数
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-   if (width == 0 || height == 0) return;//当最小化窗口的时候，自动退出，防止aspectRatio得到错误的结果
-   glViewport(0, 0, width, height);
+    if (width == 0 || height == 0) return;//当最小化窗口的时候，自动退出，防止aspectRatio得到错误的结果
+    glViewport(0, 0, width, height);
 
-   aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+    aspectRatio = static_cast<float>(width) / static_cast<float>(height);
 }
 
 //鼠标回调函数
 void mouse_callback(GLFWwindow* window, double pos_x, double pos_y)
 {
-   float sensitivity = 0.05f;//灵敏度
+    float sensitivity = 0.05f;//灵敏度
 
-   if (FirstMouse)
-   {
-       pos_x = (double)LastX;
-       pos_y = (double)LastY;
-       FirstMouse = false;
-   }
+    if (FirstMouse)
+    {
+        pos_x = (double)LastX;
+        pos_y = (double)LastY;
+        FirstMouse = false;
+    }
 
-   if (!glfwGetKey(window, GLFW_KEY_LEFT_ALT) && !glfwGetKey(window, GLFW_KEY_RIGHT_ALT))
-   {
-       float offset_x = ((float)pos_x - LastX);
-       float offset_y = (LastY - (float)pos_y);
-       LastX = (float)pos_x;
-       LastY = (float)pos_y;
+    if (!glfwGetKey(window, GLFW_KEY_LEFT_ALT) && !glfwGetKey(window, GLFW_KEY_RIGHT_ALT))
+    {
+        float offset_x = ((float)pos_x - LastX);
+        float offset_y = (LastY - (float)pos_y);
+        LastX = (float)pos_x;
+        LastY = (float)pos_y;
 
-       //按下过并松开Alt
-       if (IsAlt && IsAltRealise)
-       {
-           //按下过Alt并松开后对Yaw、Pitch进行RollBack
-           camera.IfRollBack = true;
-           IsAlt = false;
-           IsAltRealise = false;
-       }
+        //按下过并松开Alt
+        if (IsAlt && IsAltRealise)
+        {
+            //按下过Alt并松开后对Yaw、Pitch进行RollBack
+            camera.IfRollBack = true;
+            IsAlt = false;
+            IsAltRealise = false;
+        }
 
-       camera.ProcessMouseMove(offset_x, offset_y);
-   }
+        camera.ProcessMouseMove(offset_x, offset_y);
+    }
 }
 
 //滚轮回调函数
 void scroll_callback(GLFWwindow* window, double offset_x, double offset_y)
 {
-   camera.ProcessMouseScroll((float)offset_x, (float)offset_y);
+    camera.ProcessMouseScroll((float)offset_x, (float)offset_y);
 }
 
 //输入函数
 void processInput(GLFWwindow* window)
 {
-   //检测ESC
-   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-   {
-       glfwSetWindowShouldClose(window, GL_TRUE);
-   }
+    //检测ESC
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(window, GL_TRUE);
+    }
 
-   //检测space
-   CurrentSpacePressd = (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
-   if (!LastSpacePressd && CurrentSpacePressd)
-   {
-       IsPaused = !IsPaused;
-   }
-   LastSpacePressd = CurrentSpacePressd;
+    //检测space
+    CurrentSpacePressd = (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
+    if (!LastSpacePressd && CurrentSpacePressd)
+    {
+        IsPaused = !IsPaused;
+    }
+    LastSpacePressd = CurrentSpacePressd;
 
-   //检测Alt
-   if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS)
-   {
-       glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);//显示鼠标并恢复活动范围
-       IsAlt = true;
-   }
-   else
-   {
-       glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);//隐藏鼠标并将鼠标的活动范围限制在窗口内
-       if (IsAlt)
-       {
-           IsAltRealise = true;//当按下过Alt之后，松开才有效(保证Alt松开之后仍被某几帧检测到的时候，不会擅自恢复角度)
-       }
-   }
+    //检测Alt
+    if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS)
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);//显示鼠标并恢复活动范围
+        IsAlt = true;
+    }
+    else
+    {
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);//隐藏鼠标并将鼠标的活动范围限制在窗口内
+        if (IsAlt)
+        {
+            IsAltRealise = true;//当按下过Alt之后，松开才有效(保证Alt松开之后仍被某几帧检测到的时候，不会擅自恢复角度)
+        }
+    }
 
-   //检测AWSD
-   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-   {
-       camera.ProcessWASD(FORWARD, PeriodTime);
-   }
-   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-   {
-       camera.ProcessWASD(BACKWARD, PeriodTime);
-   }
-   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-   {
-       camera.ProcessWASD(LEFT, PeriodTime);
-   }
-   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-   {
-       camera.ProcessWASD(RIGHT, PeriodTime);
-   }
+    //检测AWSD
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    {
+        camera.ProcessWASD(FORWARD, PeriodTime);
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        camera.ProcessWASD(BACKWARD, PeriodTime);
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        camera.ProcessWASD(LEFT, PeriodTime);
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        camera.ProcessWASD(RIGHT, PeriodTime);
+    }
 
-   //检测上下方向键
-   float RateSpeed = 5.0f * PeriodTime;
-   if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-   {
-       if (rate < 4.0f)
-       {
-           rate += RateSpeed;
-       }
-   }
-   if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-   {
-       if (rate > -2.0f)
-       {
-           rate -= RateSpeed;
-       }
-   }
+    //检测上下方向键
+    float RateSpeed = 5.0f * PeriodTime;
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+    {
+        if (rate < 4.0f)
+        {
+            rate += RateSpeed;
+        }
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+    {
+        if (rate > -2.0f)
+        {
+            rate -= RateSpeed;
+        }
+    }
 
-   //检测F键
-   CurrentKeyPressd_F = (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS);
-   if (CurrentKeyPressd_F && !LastKeyPressd_F)
-   {
-       IsKey_F = !IsKey_F;
-   }
-   LastKeyPressd_F = CurrentKeyPressd_F;
+    //检测F键
+    CurrentKeyPressd_F = (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS);
+    if (CurrentKeyPressd_F && !LastKeyPressd_F)
+    {
+        IsKey_F = !IsKey_F;
+    }
+    LastKeyPressd_F = CurrentKeyPressd_F;
 
-   //检测E键
-   CurrentKeyPressd_E = (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS);
-   if (CurrentKeyPressd_E && !LastKeyPressd_E)
-   {
-       IsKey_E = !IsKey_E;
-   }
-   LastKeyPressd_E = CurrentKeyPressd_E;
+    //检测E键
+    CurrentKeyPressd_E = (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS);
+    if (CurrentKeyPressd_E && !LastKeyPressd_E)
+    {
+        IsKey_E = !IsKey_E;
+    }
+    LastKeyPressd_E = CurrentKeyPressd_E;
 
-   //检测M键
-   CurrentKeyPressd_M = (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS);
-   if (CurrentKeyPressd_M && !LastKeyPressd_M)
-   {
-       IsKey_M = !IsKey_M;
-   }
-   LastKeyPressd_M = CurrentKeyPressd_M;
+    //检测M键
+    CurrentKeyPressd_M = (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS);
+    if (CurrentKeyPressd_M && !LastKeyPressd_M)
+    {
+        IsKey_M = !IsKey_M;
+    }
+    LastKeyPressd_M = CurrentKeyPressd_M;
 }
 
 
@@ -743,6 +735,7 @@ void processInput(GLFWwindow* window)
 //光栅化 : 在光栅化阶段，OpenGL 会根据顶点的屏幕空间坐标确定三角形的边界，并计算出所有位于三角形内部的片段（即像素）的位置。
 //片段着色器 : 每个生成的片段会传递给片段着色器，进行进一步处理，如计算颜色和光照等。/**片段着色器中有这个图形的所有像素点
 //**从顶点着色器向片段着色器传递的量都是插值后的量(vShader out FragColor(仅有顶点颜色) -> fShader in FragColor(有每个像素点的颜色))
+//gl_Positon也会插值后在片段着色器中被使用，但我们不需要显式地接收gl_Positon
 
 //顶点数组对象（VAO）在OpenGL中负责将顶点缓冲区对象（VBO）中的数据传递给顶点着色器//
 //一、1.创建一个缓冲区VBO      2.告诉该缓冲区如何存储数据  3.将数据传递给VBO，
@@ -754,8 +747,10 @@ void processInput(GLFWwindow* window)
 //三、多级渐远纹理：当摄像机离物体很远时，很难获取高分辨率的纹理，于是预先创建一个Mipmap（由很多分辨率不断折半的原纹理组成），然后取临近分辨率或取插值分辨率
 
 /*坐标变换*/
-//局部坐标系 -> (模型变换) -> 世界坐标系 -> (视图变换) -> 观察坐标系 -> (投影变换) -> 裁剪坐标系 -> (透视除法) -> 规范设备坐标系 -> (视口变换) -> 屏幕坐标系 -> 进行深度测试等渲染过程
-
+//局部坐标系 -> (模型变换) -> 世界坐标系 -> (视图变换) -> 观察坐标系 -> (投影变换) -> 裁剪坐标系 -> (裁剪+透视除法) -> 规范设备坐标系(NDC) -> (视口变换) -> 屏幕坐标系 -> 进行深度测试等渲染过程
+//世界空间以一个固定点(0,0,0)为坐标系原点，视图空间以摄像机位置为坐标系原点，这两个空间都是线性空间(顶点的相对位置不会改变)
+//投影矩阵将顶点从视图空间变换到裁剪空间(这一步叫视图变换),视图变换将顶点深度值(z坐标值)进行非线性缩放(模拟近大远小的效果)，故裁剪空间是一个非线性空间(原本顶点的相对位置发生了变化)
+//变换到裁剪空间之后会由OpenGL自动完成裁剪和透视除法(依靠齐次坐标w)，将顶点变换到NDC中，此时x/y/z的值都在(-1,1)之间
 
 /*齐次坐标分量w*/
 // 在裁剪空间中w由摄像机位置、近远裁剪面等计算得出
@@ -828,7 +823,7 @@ void processInput(GLFWwindow* window)
 //天空盒会始终被绘制在场景的最远处(深度值为1.0，最远深度)，而不会覆盖其他物体，所以即使物体移出了天空盒的范围，天空盒依然会在渲染时覆盖整个背景。
 //三、如果我们第一个渲染天空盒且禁用深度写入，则不会覆盖后渲染的物体，但在后续渲染其他物体时还需要丢弃被遮挡的天空盒片段，
 //所以我们可以最后渲染天空盒并让OpenGL始终认为天空盒的深度值为1.0(最远深度值)
-//四、如果我们在想在任意顺序渲染天空盒(优化减少片段渲染量)，则需要暂时将深度检测函数设为LEAQAL,保证天空盒仅在尚未屏幕中渲染过物体的位置通过深度检测，同时将这些位置深度值改为1.0(虽然默认值就是1.0)
+//四、如果我们在想在任意顺序渲染天空盒(优化减少片段渲染量)，则需要暂时将深度检测函数设为LEAQAL,保证天空盒仅在尚未屏幕中渲染过物体的位置通过深度检测，同时将这些位置深度值改为1.0(虽然本来就是1.0)
 
 /*几何着色器*/
 //一、几何着色器处于顶点着色器和片段着色器之间(若没有显式编写几何着色器则不会使用)，用于生成新的顶点和修改已有的图元
@@ -837,144 +832,6 @@ void processInput(GLFWwindow* window)
 //四、如果我们启用了几何着色器，那么从顶点着色器中out的变量必须要依靠几何着色器的间接传递才能在片段着色器中接收
 //五、从顶点着色器向几何着色器传递数据都是一组一组传递的，每一组包含一个图元所有的所有顶点数据(位置、法向量、纹理坐标等)
 //六、可以理解为几何着色器中又包含了一个图元顶点数目个数的顶点着色器
-
-
-
-
-
-
-
-//std::vector<Vertex> BoxVertices = {
-//    //aPos                  //aNormal           //aTexture
-//    // 后面 (z = -0.5)
-//    {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f}},// 左下角
-//    {{0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 0.0f}},// 右下角
-//    {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f}},// 右上角
-//    {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {1.0f, 1.0f}},// 右上角
-//    {{-0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 1.0f}},// 左上角
-//    {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f}},// 左下角
-//
-//    // 前面 (z = 0.5)
-//    {{-0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},// 左下角
-//    {{0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 0.0f}},// 右下角
-//    {{0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},// 右上角
-//    {{0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},// 右上角
-//    {{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},// 左上角
-//    {{-0.5f, -0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}},// 左下角
-//
-//    // 左面 (x = -0.5)
-//    {{-0.5f, 0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},// 上左角
-//    {{-0.5f, 0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}},// 上右角
-//    {{-0.5f, -0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}},// 下右角
-//    {{-0.5f, -0.5f, -0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}},// 下右角
-//    {{-0.5f, -0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},// 下左角
-//    {{-0.5f, 0.5f, 0.5f}, {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},// 上左角
-//
-//    // 右面 (x = 0.5)
-//    {{0.5f, 0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},// 上左角
-//    {{0.5f, 0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}},// 上右角
-//    {{0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}},// 下右角
-//    {{0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}},// 下右角
-//    {{0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},// 下左角
-//    {{0.5f, 0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},// 上左角
-//
-//    // 下面 (y = -0.5)
-//    {{-0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f}},// 左上角
-//    {{0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 1.0f}},// 右上角
-//    {{0.5f, -0.5f, 0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},// 右下角
-//    {{0.5f, -0.5f, 0.5f}, {0.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},// 右下角
-//    {{-0.5f, -0.5f, 0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},// 左下角
-//    {{-0.5f, -0.5f, -0.5f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f}},// 左上角
-//
-//    // 上面 (y = 0.5)
-//    {{-0.5f, 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f}},// 左上角
-//    {{0.5f, 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 1.0f}},// 右上角
-//    {{0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},// 右下角
-//    {{0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},// 右下角
-//    {{-0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},// 左下角
-//    {{-0.5f, 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f}}// 左上角
-//};
-//
-//std::vector<unsigned int> BoxIndices = {
-//    // 后面
-//    0, 1, 2,
-//    3, 4, 5,
-//    // 前面
-//    6, 7, 8,
-//    9, 10, 11,
-//    // 左面
-//    12, 13, 14,
-//    15, 16, 17,
-//    // 右面
-//    18, 19, 20,
-//    21, 22, 23,
-//    // 下面
-//    24, 25, 26,
-//    27, 28, 29,
-//    // 上面
-//    30, 31, 32,
-//    33, 34, 35
-//};
-// 
-//std::vector<Texture> BoxTextures = 
-//{
-//    {BoxTexture1,"DiffuseColorSampler","source/Makima.jpg"},//贴图地址可给可不给
-//    {BoxTexture2,"DiffuseColorSampler","source/Makima3.jpg"},
-//    {BoxTexture1,"SpecularColorSampler","source/Makima.jpg"},
-//    {BoxTexture2,"SpecularColorSampler","source/Makima3.jpg"}
-//};
-// 
-// 
-//     /*方块绘制*/
-//        //激活着色器程序
-//BoxShader.Use();
-//
-////调整纹理可见度
-//RateControl(window, rate);
-//BoxShader.SetFloat("rate", rate);
-//
-////模型矩阵
-//glm::mat4 model1 = glm::mat4(1.0f);//每一帧都要重新创建model，否则会使用上一帧已经变换过的model
-//model1 = glm::translate(model1, glm::vec3(0.0f, 0.0f, 0.5f));
-////model1 = glm::rotate(model1, PassedTime * glm::radians(-50.0f), glm::vec3(1.0f, 1.0f, -1.0f));//这里先应用旋转，再应用位移
-//model1 = glm::scale(model1, glm::vec3(0.5f));
-//BoxShader.setMat4("model", model1);
-////法线矩阵
-//BoxShader.setMat3("NormalMatrix", glm::mat3(glm::transpose(glm::inverse(model1))));//模型矩阵左上角3x3部分的逆矩阵的转置矩阵
-//BoxShader.setMat4("view", view);
-//BoxShader.setMat4("projection", projection);
-//BoxShader.SetVec3("ViewPos", CameraPos);
-//
-////点光源
-//BoxShader.SetVec3("pointLight.Pos", LightPos);
-//BoxShader.SetVec3("pointLight.Ambient", LightColor* glm::vec3(0.2f));
-//BoxShader.SetVec3("pointLight.Diffuse", LightColor* glm::vec3(0.5f));
-//BoxShader.SetVec3("pointLight.Specular", LightColor* glm::vec3(1.0f));
-//BoxShader.SetFloat("pointLight.constant", 1.0f);
-//BoxShader.SetFloat("pointLight.linear", 0.35f);
-//BoxShader.SetFloat("pointLight.quadratic", 0.44f);
-////定向光
-//BoxShader.SetVec3("directLight.Dir", LightDirection);
-//BoxShader.SetVec3("directLight.Ambient", DirectColor* glm::vec3(0.2f));
-//BoxShader.SetVec3("directLight.Diffuse", DirectColor* glm::vec3(0.5f));
-//BoxShader.SetVec3("directLight.Specular", DirectColor* glm::vec3(1.0f));
-////手电光
-//BoxShader.SetVec3("flashLight.Pos", CameraPos);
-//BoxShader.SetVec3("flashLight.Dir", CameraFront);
-//BoxShader.SetVec3("flashLight.Diffuse", FlashColor* glm::vec3(0.5f));
-//BoxShader.SetVec3("flashLight.Specular", FlashColor* glm::vec3(1.0f));
-//BoxShader.SetFloat("flashLight.InnerAngle", glm::cos(glm::radians(5.0f)));
-//BoxShader.SetFloat("flashLight.OuterAngle", glm::cos(glm::radians(10.0f)));
-//BoxShader.SetFloat("flashLight.constant", 1.0f);
-//BoxShader.SetFloat("flashLight.linear", 0.35f);
-//BoxShader.SetFloat("flashLight.quadratic", 0.44f);
-////设置材质
-//BoxShader.SetFloat("material.Shininess", 32.0f);
-//
-////模板检测
-//glStencilFunc(GL_ALWAYS, 1, 0xFF);
-//glStencilMask(0xFF);//将该箱子所对应的缓冲区模板值更新为1
-////此时整个模板缓冲区中：该箱子的对应位置的模板值为1，其余位置为0
-//
-////绘制  
-//BoxMesh.Draw(BoxShader);
+//七、顶点着色器中的gl_Position算出来是哪个空间的，几何着色器就在哪个空间进行下一步计算
+//八、可以在顶点着色器中将gl_Positon变换到裁剪空间，也可以先在顶点着色器中将gl_Position变换到观察空间然后在几何着色器中进行其他处理再将其变换到裁剪空间
+/*九、如果要在几何着色器中使用顶点(gl_Position)之间的线性关系来计算其他量(如法线)时，要确保从顶点着色器中获取的gl_Positon是观察空间中的量，计算完还要再把gl_Positon转换到裁剪空间中*/
