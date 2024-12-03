@@ -13,16 +13,17 @@ out vec3 Normal;
 out vec3 FragPos;
 
 uniform float PassedTime;
+uniform mat4 projection;
 
-//¼ÆËãÈı½ÇĞÎÍ¼ÔªµÄ·¨ÏòÁ¿
+//è®¡ç®—ä¸‰è§’å½¢å›¾å…ƒçš„æ³•å‘é‡
 vec3 GetNormal()
 {
-	vec3 a = vec3(gl_in[0].gl_Position) - vec3(gl_in[1].gl_Position);//´Ë´¦Èı½ÇĞÎÍ¼Ôª¶¥µãË³ĞòÎªË³Ê±ÕëÅÅÁĞ
+	vec3 a = vec3(gl_in[0].gl_Position) - vec3(gl_in[1].gl_Position);
 	vec3 b = vec3(gl_in[2].gl_Position) - vec3(gl_in[1].gl_Position);
-	return normalize(cross(a,b));
+	return normalize(cross(b,a));//ä¸‰è§’å½¢å›¾å…ƒé¡¶ç‚¹é¡ºåºä¸ºé€†æ—¶é’ˆæ’åˆ—æ—¶ä½¿ç”¨cross(b,a)ï¼Œé¡ºæ—¶é’ˆæ’åˆ—æ—¶ä½¿ç”¨cross(a,b)
 }
 
-//»ñÈ¡±¬Õ¨ºóµÄ¶¥µãÎ»ÖÃ
+//è·å–çˆ†ç‚¸åçš„é¡¶ç‚¹ä½ç½®
 vec4 GetExplodedPos(vec4 position,vec3 normal)
 {
 	float ExplosionSpeed = 2.0f;
@@ -34,20 +35,20 @@ void main()
 {
 	vec3 normal = GetNormal();
 
-	//µÚÒ»¸ö¶¥µã
-	gl_Position = GetExplodedPos(gl_in[0].gl_Position,normal);
+	//ç¬¬ä¸€ä¸ªé¡¶ç‚¹
+	gl_Position = projection * GetExplodedPos(gl_in[0].gl_Position,normal);//ç”±äºä¼ å…¥çš„gl_Positonæ—¶è§‚å¯Ÿç©ºé—´ä¸‹çš„é‡ï¼Œæ•…ä¼ å‡ºæ—¶åº”å†å°†å…¶å˜æ¢åˆ°è£å‰ªç©ºé—´
 	TexCoord = gShader_In[0].TexCoord;
 	Normal = gShader_In[0].Normal;
 	FragPos = gShader_In[0].FragPos;
 	EmitVertex();
-	//µÚ¶ş¸ö¶¥µã
-	gl_Position = GetExplodedPos(gl_in[1].gl_Position,normal);
+	//ç¬¬äºŒä¸ªé¡¶ç‚¹
+	gl_Position = projection * GetExplodedPos(gl_in[1].gl_Position,normal);
 	TexCoord = gShader_In[1].TexCoord;
 	Normal = gShader_In[1].Normal;
 	FragPos = gShader_In[1].FragPos;
 	EmitVertex();
-	//µÚÈı¸ö¶¥µã
-	gl_Position = GetExplodedPos(gl_in[2].gl_Position,normal);
+	//ç¬¬ä¸‰ä¸ªé¡¶ç‚¹
+	gl_Position = projection * GetExplodedPos(gl_in[2].gl_Position,normal);
 	TexCoord = gShader_In[2].TexCoord;
 	Normal = gShader_In[2].Normal;
 	FragPos = gShader_In[2].FragPos;
