@@ -1,9 +1,12 @@
 #ifndef PERSONDRAW_H
 #define PERSONDRAW_H
+#include <cmath>
+#include <vector>
 #include "../Shader.h"
 #include "../Mesh.h"
 #include "../Model.h"
 #include "../Camera.h"
+#include "../ModelDraw_Object/InstanceSource.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -135,7 +138,7 @@ public:
     {
         ModelShader.Use();
         //计算
-        //ModelShader.SetFloat("PassedTime",PassedTime);//爆裂效果用
+        //ModelShader.SetFloat("PassedTime",PassedTime);
         //材质
         ModelShader.SetInt("SkyBoxTexture", 2);
         //点光源
@@ -146,6 +149,33 @@ public:
         ModelShader.SetVec3("flashLight.Specular", FlashLightColor * glm::vec3(1.0f));
         //绘制
         PersonModel.Draw(ModelShader);
+    }
+
+    //骑士实例绘制
+    void KnightInstanceDraw(int num)
+    {
+        ModelShader.Use();
+        //计算
+        glm::mat4 ModelMatrix_Rotate = glm::mat4(1.0f);
+        ModelMatrix_Rotate = glm::rotate(ModelMatrix_Rotate,PassedTime * glm::radians(25.0f),glm::vec3(0.0f,1.0f,0.0f));
+        ModelShader.setMat4("model_rotate",ModelMatrix_Rotate);
+
+        std::vector<glm::vec3> Offsets = GetOffsets_Knight(std::cbrt(num));
+        for (int i = 0; i < num; i++)
+        {
+            std::string index = std::to_string(i);//将i转换为string
+            ModelShader.SetVec3(("Offsets[" + index + "]").c_str(),Offsets[i]);
+        }
+        //材质
+        ModelShader.SetInt("SkyBoxTexture", 2);
+        //点光源
+        ModelShader.SetVec3("pointLight.Specular", PointLightColor * glm::vec3(1.0f));
+        //平行光
+        ModelShader.SetVec3("directLight.Specular", DirectLightColor * glm::vec3(1.0f));
+        //手电光
+        ModelShader.SetVec3("flashLight.Specular", FlashLightColor * glm::vec3(1.0f));
+        //绘制
+        PersonModel.InstanceDraw(ModelShader,num);
     }
 
     //今汐绘制
