@@ -9,23 +9,25 @@
 
 #define MAX_BONE_INFLUENCE 4
 
-//Íø¸ñ¶¥µãÊôĞÔ
+//ç½‘æ ¼é¡¶ç‚¹å±æ€§
 struct Vertex {
 	glm::vec3 Position;
 	glm::vec3 Normal;
 	glm::vec2 TexCoords;
 };
-//Íø¸ñÎÆÀíÊı¾İ
+//ç½‘æ ¼çº¹ç†æ•°æ®
 struct Texture {
-	unsigned int id;//ÎÆÀíid
-	std::string type;//ÌùÍ¼ÀàĞÍ£¨Âş·´ÉäÌùÍ¼/¾µÃæ·´ÉäÌùÍ¼£©
-	std::string path;//ÎÆÀíÂ·¾¶(ÓÃÓÚÅĞ¶ÏÎÆÀíÊÇ·ñÖØ¸´)
+	unsigned int id;//çº¹ç†id
+	std::string type;//è´´å›¾ç±»å‹ï¼ˆæ¼«åå°„è´´å›¾/é•œé¢åå°„è´´å›¾ï¼‰
+	std::string path;//çº¹ç†è·¯å¾„(ç”¨äºåˆ¤æ–­çº¹ç†æ˜¯å¦é‡å¤)
 };
 
 
 class Mesh {
 public:
-	/*Íø¸ñÊı¾İ*/
+	/*æ¸²æŸ“æ•°æ®*/
+	unsigned int VAO, VBO, EBO;
+	/*ç½‘æ ¼æ•°æ®*/
 	std::vector<Vertex>	vertices;
 	std::vector<unsigned int> indices;
 	std::vector<Texture> textures;
@@ -39,7 +41,7 @@ public:
 		setupMesh();
 	}
 
-	//·â×°ÁË°ó¶¨VAO¡¢ÎÆÀíºÍ»­Í¼µÄ¹¦ÄÜ
+	//å°è£…äº†ç»‘å®šVAOã€çº¹ç†å’Œç”»å›¾çš„åŠŸèƒ½
 	void Draw(Shader& shader)
 	{
 		unsigned int diffuseNr = 1;
@@ -48,8 +50,8 @@ public:
 		unsigned int ambientNr = 1;
 		for (unsigned int i = 0; i < textures.size(); i++)
 		{
-			glActiveTexture(GL_TEXTURE0 + i); // ÔÚ°ó¶¨Ö®Ç°¼¤»îÏàÓ¦µÄÎÆÀíµ¥Ôª
-			// »ñÈ¡ÎÆÀíĞòºÅ£¨DiffuseColorSamplerN ÖĞµÄ N£©
+			glActiveTexture(GL_TEXTURE0 + i); // åœ¨ç»‘å®šä¹‹å‰æ¿€æ´»ç›¸åº”çš„çº¹ç†å•å…ƒ
+			// è·å–çº¹ç†åºå·ï¼ˆDiffuseColorSamplerN ä¸­çš„ Nï¼‰
 			std::string number;
 			std::string name = textures[i].type;
 			if (name == "DiffuseColorSampler")
@@ -61,44 +63,74 @@ public:
 			else if (name == "AmbientColorSampler")
 				number = std::to_string(ambientNr++);
 
-			shader.SetInt(("material." + name + number).c_str(), i);//Æ´½Ó³Ématerial.DiffuseColorSampler1¡¢material.DiffuseColorSampler2¡¢material.DiffuseColorSampler3µÈ
-			glBindTexture(GL_TEXTURE_2D, textures[i].id);//½«¸ÃÎÆÀíid°ó¶¨µ½¼¤»î¹ıµÄÎÆÀíµ¥ÔªÉÏ
+			shader.SetInt(("material." + name + number).c_str(), i);//æ‹¼æ¥æˆmaterial.DiffuseColorSampler1ã€material.DiffuseColorSampler2ã€material.DiffuseColorSampler3ç­‰
+			glBindTexture(GL_TEXTURE_2D, textures[i].id);//å°†è¯¥çº¹ç†idç»‘å®šåˆ°æ¿€æ´»è¿‡çš„çº¹ç†å•å…ƒä¸Š
 		}
 
-		// »æÖÆÍø¸ñ
-		glBindVertexArray(VAO);//»æÖÆÇ°ÈÔĞè°ó¶¨VAO£¬ÒòÎªĞèÒªÖØĞÂ¼¤»î¶¥µãÊôĞÔÖ¸Õë
+		// ç»˜åˆ¶ç½‘æ ¼
+		glBindVertexArray(VAO);//ç»˜åˆ¶å‰ä»éœ€ç»‘å®šVAOï¼Œå› ä¸ºéœ€è¦é‡æ–°æ¿€æ´»é¡¶ç‚¹å±æ€§æŒ‡é’ˆ
 		glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 	}
 
-private:
-	/*äÖÈ¾Êı¾İ*/
-	unsigned int VAO, VBO, EBO;
+	//å®ä¾‹ç»˜åˆ¶
+	void InstanceDraw(Shader& shader,int num)
+	{
+		unsigned int diffuseNr = 1;
+		unsigned int specularNr = 1;
+		unsigned int emissionNr = 1;
+		unsigned int ambientNr = 1;
+		for (unsigned int i = 0; i < textures.size(); i++)
+		{
+			glActiveTexture(GL_TEXTURE0 + i); // åœ¨ç»‘å®šä¹‹å‰æ¿€æ´»ç›¸åº”çš„çº¹ç†å•å…ƒ
+			// è·å–çº¹ç†åºå·ï¼ˆDiffuseColorSamplerN ä¸­çš„ Nï¼‰
+			std::string number;
+			std::string name = textures[i].type;
+			if (name == "DiffuseColorSampler")
+				number = std::to_string(diffuseNr++);
+			else if (name == "SpecularColorSampler")
+				number = std::to_string(specularNr++);
+			else if (name == "EmissionColorSampler")
+				number = std::to_string(emissionNr++);
+			else if (name == "AmbientColorSampler")
+				number = std::to_string(ambientNr++);
 
-	/*º¯Êı*/
+			shader.SetInt(("material." + name + number).c_str(), i);//æ‹¼æ¥æˆmaterial.DiffuseColorSampler1ã€material.DiffuseColorSampler2ã€material.DiffuseColorSampler3ç­‰
+			glBindTexture(GL_TEXTURE_2D, textures[i].id);//å°†è¯¥çº¹ç†idç»‘å®šåˆ°æ¿€æ´»è¿‡çš„çº¹ç†å•å…ƒä¸Š
+		}
+
+		// ç»˜åˆ¶ç½‘æ ¼
+		glBindVertexArray(VAO);//ç»˜åˆ¶å‰ä»éœ€ç»‘å®šVAOï¼Œå› ä¸ºéœ€è¦é‡æ–°æ¿€æ´»é¡¶ç‚¹å±æ€§æŒ‡é’ˆ
+		glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, 0,num);
+		glBindVertexArray(0);
+	}
+
+private:
+
+	/*å‡½æ•°*/
 	void setupMesh()
 	{
 		glGenVertexArrays(1, &VAO);
-		glGenBuffers(1, &VBO);//Éú³ÉÒ»¸ö»º³å¶ÔÏó£¬²¢½«ÆäID´¢´æÔÚ±äÁ¿VBOÖĞ£¨VBOÓÃÓÚ´æ´¢¶¥µãÊı¾İ£¬½«Êı¾İ´ÓcpuÉÏ´«µ½gpuÖĞ£©
+		glGenBuffers(1, &VBO);//ç”Ÿæˆä¸€ä¸ªç¼“å†²å¯¹è±¡ï¼Œå¹¶å°†å…¶IDå‚¨å­˜åœ¨å˜é‡VBOä¸­ï¼ˆVBOç”¨äºå­˜å‚¨é¡¶ç‚¹æ•°æ®ï¼Œå°†æ•°æ®ä»cpuä¸Šä¼ åˆ°gpuä¸­ï¼‰
 		glGenBuffers(1, &EBO);
 
-		//½«Ö¸¶¨µÄ VAO °ó¶¨Îªµ±Ç°µÄ VAO
+		//å°†æŒ‡å®šçš„ VAO ç»‘å®šä¸ºå½“å‰çš„ VAO
 		glBindVertexArray(VAO);
 
-		//Ìî³äVBOÊı¾İ
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);//½«´´½¨ºÃµÄ»º³å¶ÔÏóVBO°ó¶¨µ½openglµÄ°ó¶¨µãGL_ARRAY_BUFFERÉÏ£¨Ê¹µÃºóĞøµÄ²Ù×÷£¨ÈçÊı¾İÉÏ´«¡¢ÉèÖÃ¶¥µãÊôĞÔ£©¶¼»áÓ°Ïìµ½Õâ¸öÌØ¶¨µÄ»º³åÇø¶ÔÏó£©
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);//½«Êı¾İ¸´ÖÆµ½µ±Ç°°ó¶¨µÄ»º³åÇøÖĞ(»º³åÄ¿±ê¡¢»º³åÄÚÈİ´óĞ¡¡¢»º³åÄÚÈİ¡¢Êı¾İ¹ÜÀí·½Ê½)
-		//Ìî³äEBOÊı¾İ
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);//½«EBO°ó¶¨µ½openglµÄ°ó¶¨µãGL_ELEMENT_ARRAY_BUFFERÉÏ
+		//å¡«å……VBOæ•°æ®
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);//å°†åˆ›å»ºå¥½çš„ç¼“å†²å¯¹è±¡VBOç»‘å®šåˆ°openglçš„ç»‘å®šç‚¹GL_ARRAY_BUFFERä¸Šï¼ˆä½¿å¾—åç»­çš„æ“ä½œï¼ˆå¦‚æ•°æ®ä¸Šä¼ ã€è®¾ç½®é¡¶ç‚¹å±æ€§ï¼‰éƒ½ä¼šå½±å“åˆ°è¿™ä¸ªç‰¹å®šçš„ç¼“å†²åŒºå¯¹è±¡ï¼‰
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);//å°†æ•°æ®å¤åˆ¶åˆ°å½“å‰ç»‘å®šçš„ç¼“å†²åŒºä¸­(ç¼“å†²ç›®æ ‡ã€ç¼“å†²å†…å®¹å¤§å°ã€ç¼“å†²å†…å®¹ã€æ•°æ®ç®¡ç†æ–¹å¼)
+		//å¡«å……EBOæ•°æ®
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);//å°†EBOç»‘å®šåˆ°openglçš„ç»‘å®šç‚¹GL_ELEMENT_ARRAY_BUFFERä¸Š
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),&indices[0], GL_STATIC_DRAW);
 
-		// ¶¥µãÎ»ÖÃ
-		glEnableVertexAttribArray(0);//ÆôÓÃ¶¥µãÊôĞÔÊı×é(½«¶¥µãÊı¾İ´«µİ¸ø×ÅÉ«Æ÷)£¨²ÎÊıÓÉlocation = 0 ¾ö¶¨£©
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);//¸æÖªopenglÈçºÎ½âÎö¶¥µãÊı¾İ(ÊôĞÔË÷Òı[ÈÃ×ÅÉ«Æ÷ÖªµÀaPosÊÇÎ»ÖÃÊı¾İ£¬aColorÊÇÑÕÉ«Êı¾İ],Êı¾İ×é³ÉÔªËØ¸öÊı,Êı¾İÀàĞÍ,ÊÇ·ñ±ê×¼»¯,²½³¤,Æ«ÒÆÁ¿)
-		// ¶¥µã·¨Ïß
+		// é¡¶ç‚¹ä½ç½®
+		glEnableVertexAttribArray(0);//å¯ç”¨é¡¶ç‚¹å±æ€§æ•°ç»„(å°†é¡¶ç‚¹æ•°æ®ä¼ é€’ç»™ç€è‰²å™¨)ï¼ˆå‚æ•°ç”±location = 0 å†³å®šï¼‰
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);//å‘ŠçŸ¥openglå¦‚ä½•è§£æé¡¶ç‚¹æ•°æ®(å±æ€§ç´¢å¼•[è®©ç€è‰²å™¨çŸ¥é“aPosæ˜¯ä½ç½®æ•°æ®ï¼ŒaColoræ˜¯é¢œè‰²æ•°æ®],æ•°æ®ç»„æˆå…ƒç´ ä¸ªæ•°,æ•°æ®ç±»å‹,æ˜¯å¦æ ‡å‡†åŒ–,æ­¥é•¿,åç§»é‡)
+		// é¡¶ç‚¹æ³•çº¿
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
-		// ¶¥µãÎÆÀí×ø±ê
+		// é¡¶ç‚¹çº¹ç†åæ ‡
 		glEnableVertexAttribArray(2);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
 
