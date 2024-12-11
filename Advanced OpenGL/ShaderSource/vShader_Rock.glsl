@@ -9,12 +9,15 @@ out vec2 TexCoord;
 out vec3 Normal;
 out vec3 FragPos;
 
+uniform mat4 model_rotation;///自转模型矩阵
+uniform mat4 model_revolution;//公转模型矩阵
 uniform mat4 view;
 uniform mat4 projection;
 void main()
 {
+    mat4 ModelMatrix = model_revolution * aModelMatrix * model_rotation;//矩阵的旋转轴：左乘是世界坐标系中的轴，右乘是自身坐标系中的轴
+    gl_Position = projection * view * ModelMatrix * vec4(aPos, 1.0);
     TexCoord = aTexCoord;    
-    gl_Position = projection * view * aModelMatrix * vec4(aPos, 1.0);
     FragPos = vec3(aModelMatrix * vec4(aPos,1.0f));
     Normal = aNormalMatrix * aNormal;
 }
