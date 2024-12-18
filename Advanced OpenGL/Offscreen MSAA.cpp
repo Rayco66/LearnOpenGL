@@ -1,870 +1,870 @@
-//#define STB_IMAGE_IMPLEMENTATION
-//#include <iostream>
-//#include <vector>
-//#include <chrono>
-//#include <map>
-//#include <filesystem>
-//#include <glad/glad.h>
-//#include <GLFW/glfw3.h>
-//#include "HeadFile/Shader.h"
-//#include "HeadFile/Mesh.h"
-//#include "HeadFile/Camera.h"
-//#include "HeadFile/TextureLoad.h"
-//#include "HeadFile/MeshDraw/MeshSource.h"
-//#include "HeadFile/MeshDraw/MeshObjectDraw.h"
-//#include "HeadFile/ModelDraw_Object/InstanceSource.h"
-//#include "HeadFile/ModelDraw_Object/ObjectDraw.h"
-//#include "HeadFile/ModelDraw_Person/PersonDraw.h"
-//
-//#include "glm/glm.hpp"
-//#include "glm/gtc/matrix_transform.hpp"
-//#include "glm/gtc/type_ptr.hpp"
-//
-//
-//#include <assimp/Importer.hpp>
-//#include <assimp/scene.h>
-//#include <assimp/postprocess.h>
-//
-//
-//
-//int WindowWidth = 1200;//´°¿Ú´óĞ¡
-//int WindowHeight = 900;
-//int WindowPos_X = 300;//´°¿Ú(×óÉÏ½Ç)Éú³ÉÎ»ÖÃ
-//int WindowPos_Y = 100;
-//float aspectRatio = (float)(WindowWidth / WindowHeight);//´°¿Ú³¤¿í±È
-//bool IsPaused = false;//ÊÇ·ñÔİÍ£
-//bool LastSpacePressd = false;//¼ì²âÉÏÒ»Ö¡ÊÇ·ñ°´ÏÂspace
-//bool CurrentSpacePressd = false;//¼ì²âµ±Ç°Ö¡ÊÇ·ñ°´ÏÂspace
-//bool IsKey_F = false;//ÊÇ·ñ°´ÏÂF¼ü
-//bool LastKeyPressd_F = false;//¼ì²âÉÏÒ»Ö¡ÊÇ·ñ°´ÏÂF¼ü
-//bool CurrentKeyPressd_F = false;//¼ì²âµ±Ç°Ö¡ÊÇ·ñ°´ÏÂF¼ü
-//bool IsKey_E = false;//ÊÇ·ñ°´ÏÂE¼ü
-//bool LastKeyPressd_E = false;//¼ì²âÉÏÒ»Ö¡ÊÇ·ñ°´ÏÂE¼ü
-//bool CurrentKeyPressd_E = false;//¼ì²âµ±Ç°Ö¡ÊÇ·ñ°´ÏÂE¼ü
-//bool IsKey_M = false;//ÊÇ·ñ°´ÏÂM¼ü
-//bool LastKeyPressd_M = false;//¼ì²âÉÏÒ»Ö¡ÊÇ·ñ°´ÏÂM¼ü
-//bool CurrentKeyPressd_M = false;//¼ì²âµ±Ç°Ö¡ÊÇ·ñ°´ÏÂM¼ü
-//bool IsAlt = false;//ÊÇ·ñ°´ÏÂAlt
-//bool IsAltRealise = false;//ÊÇ·ñËÉ¿ªAlt
-//float LastTime = 0.0f;//ÉÏÒ»Ö¡Ê±¼ä
-//float CurrentTime = 0.0f;//µ±Ç°Ö¡Ê±¼ä
-//float PassedTime = 0.0f;//·ÇÔİÍ£Ê±¾­¹ıµÄÊ±¼ä
-//float PeriodTime = 0.0f;//Ã¿Á½Ö¡Ö®¼äµÄÊ±¼ä
-//int FPSCount = 0;//Ö¡ÊıÄ¿
-//float OneSecond = 0.0f;//¼ÇÂ¼Ò»ÃëÖÓ
-//float LastX = 960;//Êó±ê³õÊ¼Î»ÖÃ£¨äÖÈ¾´°¿ÚÖĞĞÄ£©
-//float LastY = 540;
-//bool FirstMouse = true;//ÊÇ·ñÊ×´Î»ñÈ¡Êó±êÊäÈë
-//float rate = 0.0f;//ÎÆÀí¿É¼û¶È
-//
-////ÉãÏñ»úÉèÖÃ
-//Camera camera(glm::vec3(0.0f, 0.0f, 2.0f));
-//glm::vec3 CameraPos;
-//glm::vec3 CameraFront;
-//glm::vec3 CameraUP;
-//
-////¹âÕÕÉèÖÃ
-////glm::vec3 LightColor(sin(glfwGetTime() * 1.0f)/2.0f+0.5f,sin(glfwGetTime() * 1.2f)/2.0f+0.5f,sin(glfwGetTime() * 1.5f)/2.0f+0.5f);
-////µã¹âÔ´
-//glm::vec3 PointLightColor;//µã¹âÔ´ÑÕÉ«
-//glm::vec3 PointLightPos;//µã¹âÔ´Î»ÖÃ
-////Æ½ĞĞ¹â
-//glm::vec3 DirectLightDirection;//Æ½ĞĞ¹â·½Ïò
-//glm::vec3 DirectLightColor;//Æ½ĞĞ¹âÑÕÉ«
-////ÊÖµç¹â
-//glm::vec3 FlashLightColor;//ÊÖµç¹âÑÕÉ«
-//float InnerAngle;//ÊÖµç¹âÄÚÈ¦½Ç¶È£¨ÓàÏÒÖµ£©
-//float OuterAngle;//ÊÖµç¹âÍâÈ¦½Ç¶È£¨ÓàÏÒÖµ£©
-//
-//
-//void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-//void mouse_callback(GLFWwindow* window, double pos_x, double pos_y);
-//void scroll_callback(GLFWwindow* window, double offset_x, double offset_y);
-//void processInput(GLFWwindow* window);
-//
-//
-//int main()
-//{
-//    glfwInit();
-//    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-//    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-//    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);//µ±Ç°OpenGLÉÏÏÂÎÄÊ¹ÓÃºËĞÄÅäÖÃÎÄ¼ş
-//    //glfwWindowHint(GLFW_SAMPLES, 4);//½«²ÉÑùµãµÄÊıÁ¿ÉèÖÃÎª4¸ö(ÑÕÉ«»º³åÇøÀ©´ó4±¶) ÀëÆÁMASS²»ĞèÒª´ËĞĞ
-//    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);//¿ªÆôºó½ûÖ¹Ê¹ÓÃ¾ÉOpenGL¹¦ÄÜ
-//
-//    //´´½¨Ò»¸ö´°¿Ú
-//    GLFWwindow* window = glfwCreateWindow(WindowWidth, WindowHeight, "LearnOpenGL", NULL, NULL);
-//    if (window == NULL)
-//    {
-//        std::cout << "Failed to create GLFW window" << std::endl;
-//        glfwTerminate();
-//        return -1;
-//    }
-//    glfwMakeContextCurrent(window);
-//    glfwSetWindowPos(window, WindowPos_X, WindowPos_Y);//ÉèÖÃ´°¿ÚÎ»ÖÃ
-//
-//    //³õÊ¼»¯glad
-//    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-//    {
-//        std::cout << "Failed to initialize GLAD" << std::endl;
-//        return -1;
-//    }
-//
-//    //ÉèÖÃÊÓ¿Ú
-//    glViewport(0, 0, WindowWidth, WindowHeight);
-//
-//    //ÉèÖÃäÖÈ¾Ä£Ê½
-//    //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);//Ïß¿òÄ£Ê½
-//    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);//Ìî³äÄ£Ê½
-//
-//    //ÆôÓÃÉî¶È²âÊÔ¡¢Ä£°å²âÊÔ£¨È«¾Ö×´Ì¬£¬²»¹ÜÊÇÄ¬ÈÏÖ¡»º³å»¹ÊÇ×Ô½¨Ö¡»º³å¶¼»áÆôÓÃ²âÊÔ£©
-//    glEnable(GL_DEPTH_TEST);
-//    glDepthFunc(GL_LESS);
-//    glEnable(GL_STENCIL_TEST);
-//    glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);//Ä£°å¼ì²âÊ§°ÜÊ±Ä£°åÖµ²»±ä£¬Ä£°å¼ì²éÍ¨¹ıµ«Éî¶È¼ì²âÊ§°ÜÊ±Ä£°åÖµÌæ»»Îª²Î¿¼Öµ£¬¶¼Í¨¹ıÊ±Ä£°åÖµÌæ»»Îª²Î¿¼Öµ
-//
-//    //ÆôÓÃÃæÌŞ³ı
-//    //glEnable(GL_CULL_FACE);
-//
-//    //ÆôÓÃMASS¶àÖØ²ÉÑù¼¼Êõ(²»Ö÷¶¯ÆôÓÃÒ²ÓĞ¿ÉÄÜÊÇÄ¬ÈÏ¾ÍÆôÓÃÁË)
-//    glEnable(GL_MULTISAMPLE);
-//
-//    //µ÷ÓÃ´°¿Ú´óĞ¡»Øµ÷º¯Êı
-//    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);//Ã¿µ±ÓÃ»§ÊÖ¶¯µ÷Õû´°¿Ú´óĞ¡Ê±¾Í»áµ÷ÓÃ»Øµ÷º¯Êı(GLFW»á×Ô¶¯¼ì²âÊÇ·ñĞèÒªµ÷ÓÃº¯Êı£¬ËùÒÔ²»ÓÃĞ´ÔÚÑ­»·ÄÚ²¿)
-//    //¼´Ê¹Ã»ÓĞÕâ¸öº¯ÊıGLFWÒ²ÔÊĞíÓÃ»§ÊÖ¶¯µ÷½Ú´°¿Ú´óĞ¡£¬µ«²»»á°ïÎÒÃÇµ÷½ÚÊÓ¿Ú´óĞ¡ºÍÆäËûÏà¹ØÅäÖÃ
-//
-//    //Êó±ê¼ì²â
-//    //glfwSetInputMode(window,GLFW_CURSOR,GLFW_CURSOR_DISABLED);
-//    glfwSetCursorPosCallback(window, mouse_callback);//glfw×Ô¶¯²¶»ñÊó±êÎ»ÖÃ²¢´«µİ¸ømouse_callback
-//    glfwSetScrollCallback(window, scroll_callback);//²¶»ñ¹öÂÖÒÆ¶¯ÔöÁ¿²¢´«µİ¸øscroll_callback
-//
-//    //ÉèÖÃ×ÅÉ«Æ÷
-//    //Shader BoxShader("ShaderSource/vShader_Box.glsl", "ShaderSource/fShader_Box.glsl");
-//    Shader WallShader("ShaderSource/vShader_Wall.glsl", "ShaderSource/fShader_Wall.glsl");
-//    Shader LightBallShader("ShaderSource/vShader_Light.glsl", "ShaderSource/fShader_Light.glsl");
-//    Shader GrassShader("ShaderSource/vShader_Grass.glsl", "ShaderSource/fShader_Grass.glsl");
-//    Shader WindowShader("ShaderSource/vShader_Window.glsl", "ShaderSource/fShader_Window.glsl");
-//    Shader ScreenShader("ShaderSource/vShader_Screen.glsl", "ShaderSource/fShader_Screen.glsl");
-//    Shader SkyBoxShader("ShaderSource/vShader_SkyBox.glsl", "ShaderSource/fShader_SkyBox.glsl");
-//    Shader ModelShader_Knight("ShaderSource/vShader_Model.glsl", "ShaderSource/fShader_Knight.glsl");
-//    Shader ModelShader_KnightInstance("ShaderSource/vShader_KnightInstance.glsl", "ShaderSource/fShader_Knight.glsl");
-//    Shader ModelShader_JinXi("ShaderSource/vShader_Model.glsl", "ShaderSource/fShader_PersonModel.glsl");
-//    Shader FrameShader("ShaderSource/vShader_Frame.glsl", "ShaderSource/fShader_Frame.glsl");
-//    Shader DiscoBallShader("ShaderSource/vShader_DiscoBall.glsl", "ShaderSource/fShader_DiscoBall.glsl");
-//
-//    //ÉèÖÃÎÆÀí
-//    //unsigned int BoxTexture1 = LoadTexture((std::filesystem::current_path() / "source/Makima.jpg").string().c_str());//È·±£c++17ÒÔÉÏ
-//    //unsigned int BoxTexture2 = LoadTexture((std::filesystem::current_path()   / "source/Makima3.jpg").string().c_str());
-//    unsigned int WallTexture1 = LoadTexture((std::filesystem::current_path() / "source/Wall.png").string().c_str());
-//    unsigned int WallTexture2 = LoadTexture((std::filesystem::current_path() / "source/Specular Map.png").string().c_str());
-//    unsigned int WallTexture3 = LoadTexture((std::filesystem::current_path() / "source/Code.jpg").string().c_str());
-//    unsigned int GrassTexture1 = LoadTexture((std::filesystem::current_path() / "source/grass.png").string().c_str());
-//    unsigned int WindowTexture1 = LoadTexture((std::filesystem::current_path() / "source/window.png").string().c_str());
-//
-//    //ÉèÖÃÁ¢·½ÌåÌùÍ¼ÎÆÀí
-//    std::vector<std::string> SkyBoxFaces_Path = {
-//        (std::filesystem::current_path() / "source/skybox/skybox/right.jpg").string().c_str(),
-//        (std::filesystem::current_path() / "source/skybox/skybox/left.jpg").string().c_str(),
-//        (std::filesystem::current_path() / "source/skybox/skybox/top.jpg").string().c_str(),
-//        (std::filesystem::current_path() / "source/skybox/skybox/bottom.jpg").string().c_str(),
-//        (std::filesystem::current_path() / "source/skybox/skybox/front.jpg").string().c_str(),
-//        (std::filesystem::current_path() / "source/skybox/skybox/back.jpg").string().c_str()
-//    };
-//    unsigned int SkyBoxCMTexture = LoadCubeTexture(SkyBoxFaces_Path);
-//
-//
-//    //Íø¸ñÎÆÀí
-//    std::vector<Texture> WallTextures =
-//    {
-//        {WallTexture1,"DiffuseColorSampler","source/Wall.png"},
-//        {WallTexture2,"SpecularColorSampler","source/Specular Map.png"},
-//        {WallTexture3,"EmissionColorSampler","source/Code.jpg"}
-//    };
-//    std::vector<Texture> GrassTextures = {
-//        {GrassTexture1,"DiffuseColorSampler","source/grass.png"}
-//    };
-//    std::vector<Texture> WindowTextures = {
-//        {WindowTexture1,"DiffuseColorSampler","source/window.png"}
-//    };
-//    std::vector<Texture> ScreenTextures = {};
-//    std::vector<Texture> SkyBoxTextures = {};
-//
-//    //¼ÓÔØÍø¸ñ
-//    //Mesh BoxMesh(BoxVertices,BoxIndices,BoxTextures);
-//    Mesh WallMesh(WallVertices, WallIndices, WallTextures);
-//    Mesh GrassMesh(SquareVertices, SquareIndices, GrassTextures);
-//    Mesh WindowMesh(SquareVertices, SquareIndices, WindowTextures);
-//    Mesh ScreenMesh(ScreenVertices, SquareIndices, ScreenTextures);
-//    Mesh SkyBoxMesh(CubeVertices, CubeIndices, SkyBoxTextures);
-//
-//    //¼ÓÔØÄ£ĞÍ
-//    Model PersonModel_Knight((std::filesystem::current_path() / "source/nanosuit_reflection/nanosuit.obj").string());
-//    Model PersonModel_JinXi((std::filesystem::current_path() / "source/JinXi/01.fbx").string());
-//    Model LightBallModel((std::filesystem::current_path() / "source/Hollow Sphere/linked_star.obj").string());
-//    Model DiscoBallModel((std::filesystem::current_path() / "source/Ball/DiscoBall.fbx").string());
-//
-//
-//    //´´½¨¶àÖØ²ÉÑùÖ¡»º³å
-//    unsigned int MultiSampleFBO;
-//    glGenFramebuffers(1, &MultiSampleFBO);//´´½¨¶àÖØ²ÉÑùÖ¡»º³å
-//    glBindFramebuffer(GL_FRAMEBUFFER, MultiSampleFBO);//°ó¶¨MultiSampleFBO
-//    //´´½¨¶àÖØ²ÉÑùÑÕÉ«ÎÆÀí¸½¼ş
-//    unsigned int ColorTexAttachment;
-//    glGenTextures(1, &ColorTexAttachment);//´´½¨ÑÕÉ«ÎÆÀí¸½¼ş
-//    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, ColorTexAttachment);//°ó¶¨
-//    //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WindowWidth, WindowHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);//´´½¨ÎÆÀíµ«²»³õÊ¼»¯
-//    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGB, WindowWidth, WindowHeight, GL_TRUE);//´´½¨Ö§³Ö¶à²ÉÑùµãÎÆÀíÇÒ²»³õÊ¼»¯
-//    glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);//»·ÈÆ·½Ê½
-//    glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-//    glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);//¹ıÂË·½Ê½
-//    glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, ColorTexAttachment, 0);//°ÑÑÕÉ«ÎÆÀí¸½¼ş¸½¼Óµ½µ±Ç°°ó¶¨µÄMultiSampleFBOÉÏ
-//    //´´½¨¶àÖØ²ÉÑùäÖÈ¾»º³å¶ÔÏó(Éî¶ÈÄ£°å¸½¼ş)
-//    unsigned int RBO;
-//    glGenRenderbuffers(1, &RBO);//´´½¨äÖÈ¾»º³å
-//    glBindRenderbuffer(GL_RENDERBUFFER, RBO);//°ó¶¨
-//    //glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, WindowWidth, WindowHeight);//ÎªäÖÈ¾»º³å¶ÔÏó·ÖÅä´æ´¢¿Õ¼ä(Éî¶È»º³åÇø24Î»£¬Ä£°å»º³åÇø8Î»)
-//    glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, WindowWidth, WindowHeight);//Îª¶àÖØ²ÉÑùäÖÈ¾»º³å¶ÔÏó·ÖÅä´æ´¢¿Õ¼ä(Éî¶È»º³åÇø24Î»£¬Ä£°å»º³åÇø8Î»)
-//    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);//°ÑÉî¶ÈÄ£°å¸½¼ş¸½¼Óµ½µ±Ç°°ó¶¨µÄMultiSampleFBOÉÏ
-//    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)//¼ì²âMultiSampleFBOÊÇ·ñÍêÕû
-//    {
-//        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
-//    }
-//    glBindFramebuffer(GL_FRAMEBUFFER, 0);//½â°óMultiSampleFBO
-//
-//
-//    //´´½¨ºó´¦ÀíÖ¡»º³å
-//    unsigned int IntermediateFBO;
-//    glGenFramebuffers(1, &IntermediateFBO);
-//    glBindFramebuffer(GL_FRAMEBUFFER, IntermediateFBO);
-//    //´´½¨ÆÕÍ¨ÑÕÉ«ÎÆÀí¸½¼ş
-//    unsigned int ScreenTexture;
-//    glGenTextures(1, &ScreenTexture);
-//    glBindTexture(GL_TEXTURE_2D, ScreenTexture);
-//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WindowWidth, WindowHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-//    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);//»·ÈÆ·½Ê½
-//    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);//¹ıÂË·½Ê½
-//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-//    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ScreenTexture, 0);
-//
-//    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)//¼ì²âIntermediateFBOÊÇ·ñÍêÕû
-//    {
-//        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
-//    }
-//    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-//    //IntermediateFBO´æ´¢Ö»²îºó´¦ÀíµÄ»­Ãæ£¬Òò´Ë²»ĞèÒª¶îÍâµÄÉî¶ÈÄ£°å¸½¼ş
-//
-//
-//    //ModelDraw_Person
-//    PersonModelDraw Knight(ModelShader_Knight, PersonModel_Knight, &FrameShader);
-//    PersonModelDraw KnightInstance(ModelShader_KnightInstance, PersonModel_Knight);
-//    PersonModelDraw JinXi(ModelShader_JinXi, PersonModel_JinXi, &FrameShader);
-//    ObjectModelDrawWL DiscoBall(DiscoBallShader, DiscoBallModel, &FrameShader);
-//    ObjectModelDrawNL LightBall(LightBallShader, LightBallModel, &FrameShader);
-//
-//    //MeshDraw
-//    ObjectMeshDrawWL Wall(WallShader, WallMesh);
-//    ObjectMeshDrawNL Grass(GrassShader, GrassMesh);
-//    ObjectMeshDrawNL Window(WindowShader, WindowMesh);
-//    ObjectMeshDrawNL SkyBox(SkyBoxShader, SkyBoxMesh);
-//
-//    //ÊµÀı»¯ÉèÖÃ
-//    InstancedArray_Knight(PersonModel_Knight, 8);//ÓÉÓÚÎÒÃÇµÄÊµÀı»¯Êı×éaInstenceModelMatrixÊÇÔÚäÖÈ¾Ñ­»·Íâ´«µİ¸øGPUµÄ£¬ËùÒÔÈôÏëÊ¹ÓÃÓëÊ±¼äÓĞ¹ØµÄ±ä»¯Á¿ÔòĞèÒª¶îÍâÊ¹ÓÃuniform´«µİ
-//
-//    //äÖÈ¾Ñ­»·
-//    while (!glfwWindowShouldClose(window))
-//    {
-//        //²¶»ñ´¦ÀíÊäÈëÊÂ¼ş
-//        glfwPollEvents();//´¥·¢»Øµ÷º¯Êı
-//
-//        //¼ì²é¾ßÌåÊäÈë×´Ì¬
-//        processInput(window);
-//
-//        //»ñÈ¡Ã¿Ö¡Ê±¼ä
-//        CurrentTime = (float)glfwGetTime();
-//        PeriodTime = CurrentTime - LastTime;
-//        if (!IsPaused)
-//        {
-//            PassedTime += CurrentTime - LastTime;
-//        }
-//        LastTime = CurrentTime;
-//
-//        //¼ÆËãÖ¡ÂÊ
-//        FPSCount++;
-//        OneSecond += PeriodTime;
-//        if (OneSecond >= 1.0f)
-//        {
-//            float FPS = (float)FPSCount / OneSecond;
-//            std::string Title = "FPS:  " + std::to_string(FPS);
-//            glfwSetWindowTitle(window, Title.c_str());
-//            OneSecond = 0.0f;
-//            FPSCount = 0;
-//        }
-//
-//        //ÆôÓÃÖ¡»º³å
-//        glBindFramebuffer(GL_FRAMEBUFFER, MultiSampleFBO);
-//
-//        //È«¾Ö×´Ì¬Á¿ÉèÖÃ
-//            /*ÉèÖÃ´°¿Ú±³¾°ÑÕÉ«²¢ÔÚÃ¿´ÎÑ­»·ºóÖØĞÂäÖÈ¾(Çå³ıÑÕÉ«»º³åºÍÉî¶È»º³å)*/
-//        glClearColor(0.678f, 0.847f, 0.902f, 1.0f);
-//        glStencilMask(0xFF);//È·±£Ä£°å»º³åÇøÄÜÕı³£Çå¿Õ
-//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-//
-//        //ÉãÏñ»úÉèÖÃ
-//        CameraPos = camera.Pos;
-//        CameraFront = camera.Front;
-//        CameraUP = camera.Up;
-//
-//        //¹âÕÕÉèÖÃ
-//        /*µã¹âÔ´*/
-//        //PointLightColor(sin(glfwGetTime() * 1.0f)/2.0f+0.5f,sin(glfwGetTime() * 1.2f)/2.0f+0.5f,sin(glfwGetTime() * 1.5f)/2.0f+0.5f);
-//        PointLightColor = glm::vec3(1.0f);//µã¹âÔ´ÑÕÉ«
-//        PointLightPos = glm::vec3(0.9f * sin(PassedTime), 0.9f * cos(PassedTime) + 0.5f, sin(PassedTime) + 2.0f);//µã¹âÔ´Î»ÖÃ
-//        /*Æ½ĞĞ¹â*/
-//        DirectLightDirection = glm::vec3(1.0f, -1.0f, -1.0f);//Æ½ĞĞ¹â·½Ïò
-//        DirectLightColor = glm::vec3(1.0f);//Æ½ĞĞ¹âÑÕÉ«
-//        /*ÊÖµç¹â*/
-//        FlashLightColor = glm::vec3(0.0f);//ÊÖµç¹âÑÕÉ«
-//        InnerAngle = glm::cos(glm::radians(5.0f - rate));//ÊÖµç¹âÄÚÈ¦½Ç¶È£¨ÓàÏÒÖµ£©
-//        OuterAngle = glm::cos(glm::radians(10.0f + rate));//ÊÖµç¹âÍâÈ¦½Ç¶È£¨ÓàÏÒÖµ£©
-//
-//        //±ä»»¾ØÕó
-//            /*ViewMatrix*/
-//        glm::mat4 view = glm::mat4(1.0f);
-//        view = camera.GetViewMatrix();
-//        /*PorjectMatrix*/
-//        glm::mat4 projection = glm::mat4(1.0f);
-//        projection = glm::perspective(glm::radians(camera.Fov), aspectRatio, 0.1f, 100.0f);//ÊÓÒ°±äĞ¡Ê±£¬ÎïÌå½«Õ¼¾İÉãÏñ»ú£¨ÆÁÄ»£©¸ü¶àÎ»ÖÃ£¬¿´ÆğÀ´±äµÃ¸ü´ó
-//
-//
-//        //ÈËÎïÄ£ĞÍ»æÖÆ
-//            /*ÎäÊ¿Ä£ĞÍ»æÖÆ*/
-//        glActiveTexture(GL_TEXTURE2);
-//        glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxCMTexture);
-//        //±ä»»¾ØÕó
-//        glm::mat4 model_Knight = glm::mat4(1.0f);
-//        model_Knight = glm::translate(model_Knight, glm::vec3(0.5f, -1.0f, 1.0f));
-//        model_Knight = glm::scale(model_Knight, glm::vec3(0.1f));
-//        //Ä£°å²âÊÔ
-//        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-//        glStencilFunc(GL_ALWAYS, 0b00000001, 0xFF);//Ä£°å¼ì²â×ÜÊÇÍ¨¹ı£¬ÇÒÉî¶È¼ì²âÒ²ÄÜÍ¨¹ı£¬¸ù¾İglStencilOpµÚÈı¸ö²ÎÊı£¬¸ÃÍ¼ĞÎµÄÄ£°åÖµ½«±»Ìæ»»Îª00000001
-//        glStencilMask(0b00000001);//½«¸ÃÎïÌåËù¶ÔÓ¦µÄ»º³åÇøÄ£°åÖµ¸üĞÂÎª00000001£»´ËÊ±Õû¸öÄ£°å»º³åÇøÖĞ£º¸ÃÎïÌåËù¶ÔÓ¦Î»ÖÃµÄÄ£°åÖµÎª00000001¡¢ÆäÓàÎ»ÖÃÎª0
-//        //»æÖÆ
-//        Knight.GetMatrix(model_Knight, view, projection);
-//        Knight.BasicShaderSet();
-//        Knight.KinghtDraw();
-//
-//
-//        /*½ñÏ«Ä£ĞÍ»æÖÆ*/
-//        //±ä»»¾ØÕó
-//        glm::mat4 model_JinXi = glm::mat4(1.0f);
-//        model_JinXi = glm::translate(model_JinXi, glm::vec3(-0.5f, -1.0f, 1.0f));
-//        model_JinXi = glm::scale(model_JinXi, glm::vec3(0.08f));
-//        //Ä£°å²âÊÔ
-//        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-//        glStencilFunc(GL_ALWAYS, 0b00000010, 0xFF);
-//        glStencilMask(0b00000010);//½«¸ÃÎïÌåËù¶ÔÓ¦µÄ»º³åÇøÄ£°åÖµ¸üĞÂÎª00000010//´ËÊ±Õû¸öÄ£°å»º³åÇøÖĞ£º¸ÃmodelËù¶ÔÓ¦Î»ÖÃµÄÄ£°åÖµÎª00000010¡¢ÁíÒ»¸ömodelËù¶ÔÓ¦Î»ÖÃÎª00000001£¬ÈôÁ½ÕßÓĞÖØµş²¿·Ö£¬ÔòÖØµş²¿·ÖÎª00000011
-//        //»æÖÆ
-//        JinXi.GetMatrix(model_JinXi, view, projection);
-//        JinXi.BasicShaderSet();
-//        JinXi.JinXiDraw();
-//
-//
-//
-//        //ÎïÌåÄ£ĞÍ»æÖÆ
-//            /*DiscoÇò»æÖÆ*/
-//        glActiveTexture(GL_TEXTURE0);
-//        glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxCMTexture);
-//        //±ä»»¾ØÕó
-//        glm::mat4 model_DiscoBall = glm::mat4(1.0f);
-//        model_DiscoBall = glm::translate(model_DiscoBall, glm::vec3(0.0f, 1.0f, 1.0f));
-//        model_DiscoBall = glm::scale(model_DiscoBall, glm::vec3(0.005f, 0.005f, 0.005f));
-//        model_DiscoBall = glm::rotate(model_DiscoBall, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-//        model_DiscoBall = glm::rotate(model_DiscoBall, PassedTime * glm::radians(25.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-//        //Ä£°å²âÊÔ
-//        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-//        glStencilFunc(GL_ALWAYS, 1, 0xFF);//¹âÔ´Í¨¹ı¼ì²â£¬²»¶ªÆúÆ¬¶Î
-//        glStencilMask(0x00);//²»¸üĞÂ¸ÃÎïÌåËù¶ÔÓ¦µÄÄ£°å»º³åÇø//´ËÊ±Õû¸öÄ£°å»º³åÇøÖĞ£ºÖ»ÓĞÁ½¸ömodelËùÔÚÎ»ÖÃÓĞ·ÇÁãµÄÄ£°åÖµ£¬ÆäÓà²¿·Ö¾ùÎª0
-//        //»æÖÆ
-//        DiscoBall.GetMatrix(model_DiscoBall, view, projection);
-//        DiscoBall.BasicShaderSet();
-//        DiscoBall.DiscoBallDraw();
-//
-//
-//        /*¹âÔ´»æÖÆ*/
-//        //±ä»»¾ØÕó
-//        glm::mat4 model_LightBall = glm::mat4(1.0f);
-//        model_LightBall = glm::translate(model_LightBall, PointLightPos);
-//        model_LightBall = glm::scale(model_LightBall, glm::vec3(0.002f, 0.002f, 0.002f));
-//        //Ä£°å²âÊÔ
-//        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-//        glStencilFunc(GL_ALWAYS, 1, 0xFF);//¹âÔ´Í¨¹ı¼ì²â£¬²»¶ªÆúÆ¬¶Î
-//        glStencilMask(0x00);//²»¸üĞÂ¸ÃÎïÌåËù¶ÔÓ¦µÄÄ£°å»º³åÇø//´ËÊ±Õû¸öÄ£°å»º³åÇøÖĞ£ºÖ»ÓĞÁ½¸ömodelËùÔÚÎ»ÖÃÓĞ·ÇÁãµÄÄ£°åÖµ£¬ÆäÓà²¿·Ö¾ùÎª0
-//        //»æÖÆ
-//        LightBall.GetMatrix(model_LightBall, view, projection);
-//        LightBall.BasicShaderSet();
-//        LightBall.LightBallDraw();
-//
-//
-//
-//        //Íø¸ñÎïÌå»æÖÆ
-//            /*Ç½Ìå»æÖÆ*/
-//        glm::mat4 model_Wall = glm::mat4(1.0f);
-//        model_Wall = glm::translate(model_Wall, glm::vec3(0.0f, -0.2f, 1.5f));
-//        model_Wall = glm::scale(model_Wall, glm::vec3(1.5f));
-//        //Ä£°å²âÊÔ
-//        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-//        glStencilFunc(GL_ALWAYS, 1, 0xFF);//Ç½±ÚÍ¨¹ı¼ì²â£¬²»¶ªÆúÆ¬¶Î
-//        glStencilMask(0x00);//²»¸üĞÂ¸ÃÎïÌåËù¶ÔÓ¦µÄÄ£°å»º³åÇø//´ËÊ±Õû¸öÄ£°å»º³åÇøÖĞ£ºÖ»ÓĞÁ½¸ömodelËùÔÚÎ»ÖÃÓĞ·ÇÁãµÄÄ£°åÖµ£¬ÆäÓà²¿·Ö¾ùÎª0
-//        //»æÖÆ
-//        Wall.GetMatrix(model_Wall, view, projection);
-//        Wall.BasicShaderSet();
-//        Wall.WallDraw();
-//
-//
-//        /*»·¾³»æÖÆ*/
-//        if (IsKey_E)
-//        {
-//            /*²İµØ*/
-//            //¶ÔÓÚÈ«Í¸Ã÷ÎïÌå(²İÎÆÀíµÄ±ß¿ò)£º²»ĞèÒª»ìºÏ²âÊÔ£¬Ö±½Ó¶ªÆúÏàÓ¦Í¸Ã÷¶ÈµÄÆ¬¶Î¼´¿É
-//            glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-//            glStencilFunc(GL_ALWAYS, 1, 0xFF);//Í¨¹ı¼ì²â£¬²»¶ªÆúÆ¬¶Î
-//            glStencilMask(0x00);//²»¸üĞÂ¸ÃÎïÌåËù¶ÔÓ¦µÄÄ£°å»º³åÇø
-//            std::vector<glm::vec3> vegetation;
-//            vegetation.push_back(glm::vec3(-0.7f, -0.5f, 1.0f));
-//            vegetation.push_back(glm::vec3(0.7f, -0.5f, 1.0f));
-//            vegetation.push_back(glm::vec3(0.0f, -0.5f, 1.0f));
-//
-//            glm::mat4 model_Grass = glm::mat4(1.0f);
-//
-//            for (unsigned int i = 0; i < vegetation.size(); i++)
-//            {
-//                model_Grass = glm::mat4(1.0f);
-//                model_Grass = glm::translate(model_Grass, vegetation[i]);
-//                Grass.GetMatrix(model_Grass, view, projection);
-//                Grass.BasicShaderSet();
-//                Grass.GrassDraw();
-//            }
-//
-//            /*´°»§*/
-//            //¶ÔÓÚ°ëÍ¸Ã÷ÎïÌå£ºÊ¹ÓÃ»ìºÏ²âÊÔ£¬È·±£ÏÈäÖÈ¾²»Í¸Ã÷µÄÎïÌåÔÙäÖÈ¾°ëÍ¸Ã÷µÄÎïÌå£¬ÏÈäÖÈ¾Ô¶´¦µÄ°ëÍ¸Ã÷ÎïÌåÔÙäÖÈ¾½ü´¦µÄ°ëÍ¸Ã÷ÎïÌå
-//            glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-//            glStencilFunc(GL_ALWAYS, 1, 0xFF);//Í¨¹ı¼ì²â£¬²»¶ªÆúÆ¬¶Î
-//            glStencilMask(0x00);//²»¸üĞÂ¸ÃÎïÌåËù¶ÔÓ¦µÄÄ£°å»º³åÇø
-//            glEnable(GL_BLEND);//ÆôÓÃ»ìºÏ
-//            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//            std::vector<glm::vec3> vegetation2;
-//            vegetation2.push_back(glm::vec3(-0.35f, -0.5f, 1.0f));
-//            vegetation2.push_back(glm::vec3(0.35f, -0.5f, 1.5f));
-//            vegetation2.push_back(glm::vec3(0.0f, -0.5f, 2.0f));
-//            std::map<float, glm::vec3> Sorted;
-//            for (unsigned int i = 0; i < vegetation2.size(); i++)
-//            {
-//                float distence = glm::length(CameraPos - vegetation2[i]);
-//                Sorted[distence] = vegetation2[i];
-//            }
-//            glm::mat4 model_Window = glm::mat4(1.0f);
-//
-//            for (auto it = Sorted.rbegin(); it != Sorted.rend(); ++it)
-//            {
-//                model_Window = glm::mat4(1.0f);
-//                model_Window = glm::translate(model_Window, it->second);
-//                Window.GetMatrix(model_Window, view, projection);
-//                Window.BasicShaderSet();
-//                Window.GrassDraw();
-//            }
-//            glDisable(GL_BLEND);
-//        }
-//
-//        /*Ìì¿ÕºĞ*/
-//        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-//        glStencilFunc(GL_ALWAYS, 1, 0xFF);//Í¨¹ıÄ£°å¼ì²â
-//        glStencilMask(0x00);//²»¸üĞÂ¸ÃÎïÌåËù¶ÔÓ¦µÄÄ£°å»º³åÇø
-//        glDepthFunc(GL_LEQUAL);//Éî¶ÈÖµĞ¡ÓÚµÈÓÚÉî¶È»º³åÇøµÄÆ¬¶Î±»±£Áô(ÒÑ¾­äÖÈ¾¹ıÆäËûÎïÌåµÄÎ»ÖÃµÄÌì¿ÕºĞÆ¬¶Î±»¶ªÆú£¬ÉĞÎ´äÖÈ¾¹ıÆäËûÎïÌåµÄÎ»ÖÃÍ¨¹ıÉî¶È¼ì²â£¬ÏàÓ¦Éî¶È»º³åÇø±»ÉèÎª1.0(µ«ÕâĞ©µØ·½±¾À´¾ÍÊÇ1.0ÒòÎªÉî¶È»º³åÇøÄ¬ÈÏÖµÎª1.0))
-//        glActiveTexture(GL_TEXTURE0);
-//        glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxCMTexture);
-//        SkyBox.GetMatrix(glm::mat4(1.0f), glm::mat4(glm::mat3(view)), projection);//È¥³ıview¾ØÕóÖĞµÄÆ½ÒÆ²¿·Ö£¬¼´ÉãÏñ»úÊ¼ÖÕ´¦ÓÚ×ø±êÔ­µã(ÒÆ¶¯Ê±Ò²ÊÇ)
-//        SkyBox.BasicShaderSet();
-//        SkyBox.GrassDraw();
-//        glDepthFunc(GL_LESS);//ÖØĞÂÉèÖÃÉî¶È¼ì²âº¯ÊıÎªLESSÍ¨¹ı
-//
-//
-//
-//        //±ß¿ò»æÖÆ
-//        if (IsKey_F)
-//        {
-//            /*ÎäÊ¿±ß¿ò»æÖÆ*/
-//            //±ä»»¾ØÕó
-//            glm::mat4 Fmodel_Knight = glm::mat4(1.0f);
-//            Fmodel_Knight = glm::translate(Fmodel_Knight, glm::vec3(0.5f, -1.0f, 1.0f));
-//            Fmodel_Knight = glm::scale(Fmodel_Knight, glm::vec3(0.1001f));//ÂÖÀªµÄËõ·Å±¶ÊıĞèÒªÖ»±ÈÄ£ĞÍµÄËõ·Å±¶Êı´óÒ»µãµã¼´¿É
-//            //Ä£°å¼ì²â
-//            glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-//            glStencilFunc(GL_NOTEQUAL, 0b00000001, 0b00000001);//Á½¸ömodel¶ÔÓ¦Î»ÖÃµÄÄ£°åÖµ·Ö±ğÎª00000001¡¢00000010£¬ÖØµş²¿·ÖÎª00000011£¬·²ÊÇµÚÒ»Î»²»µÈÓÚ1µÄ¾ù±»¶ªÆú£¬¹ÊÖ»ÓĞ¸ÃmodelµÄ±ß¿ò²¿·ÖÄÜÍ¨¹ı¼ì²â
-//            glStencilMask(0x00);//²»¸üĞÂ¸ÃÎïÌåËù¶ÔÓ¦µÄÄ£°å»º³åÇø//´ËÊ±Õû¸öÄ£°å»º³åÇøÖĞ£ºÖ»ÓĞÁ½¸ömodelËùÔÚÎ»ÖÃÓĞ·ÇÁãµÄÄ£°åÖµ£¬ÆäÓà²¿·Ö¾ùÎª0
-//            //Éî¶È¼ì²â
-//            glDisable(GL_DEPTH_TEST);//ÔİÊ±½ûÓÃÉî¶È¼ì²â£¬Ê¹±ß¿òÓÀÔ¶ÄÜÍ¨¹ıÉî¶È¼ì²â
-//            //»æÖÆ
-//            Knight.GetFMatrix(Fmodel_Knight);
-//            Knight.BasicFShaderSet();
-//            Knight.KnightFrameDraw();
-//            //»Ö¸´Éî¶È¼ì²â
-//            glEnable(GL_DEPTH_TEST);
-//
-//
-//            /*½ñÏ¦±ß¿ò»æÖÆ*/
-//            //±ä»»¾ØÕó
-//            glm::mat4 Fmodel_JinXi = glm::mat4(1.0f);
-//            Fmodel_JinXi = glm::translate(Fmodel_JinXi, glm::vec3(-0.5f, -1.0f, 1.0f));
-//            Fmodel_JinXi = glm::scale(Fmodel_JinXi, glm::vec3(0.0801f));
-//            //Ä£°å¼ì²â
-//            glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-//            glStencilFunc(GL_NOTEQUAL, 0b00000010, 0b00000010);//Á½¸ömodel¶ÔÓ¦Î»ÖÃµÄÄ£°åÖµ·Ö±ğÎª00000001¡¢00000010£¬ÖØµş²¿·ÖÎª00000011£¬·²ÊÇµÚ¶şÎ»²»µÈÓÚ1µÄ¾ù±»¶ªÆú£¬¹ÊÖ»ÓĞ¸ÃmodelµÄ±ß¿òÄÜÍ¨¹ı¼ì²â
-//            glStencilMask(0x00);//²»¸üĞÂ¸ÃÎïÌåËù¶ÔÓ¦µÄÄ£°å»º³åÇø//´ËÊ±Õû¸öÄ£°å»º³åÇøÖĞ£ºÖ»ÓĞÁ½¸ömodelËùÔÚÎ»ÖÃÓĞ·ÇÁãµÄÄ£°åÖµ£¬ÆäÓà²¿·Ö¾ùÎª0
-//            //Éî¶È¼ì²â
-//            glDisable(GL_DEPTH_TEST);//ÔİÊ±½ûÓÃÉî¶È¼ì²â£¬Ê¹±ß¿òÓÀÔ¶ÄÜÍ¨¹ıÉî¶È¼ì²â
-//            //»æÖÆ
-//            JinXi.GetFMatrix(Fmodel_JinXi);
-//            JinXi.BasicFShaderSet();
-//            JinXi.JinXiFrameDraw();
-//            //»Ö¸´Éî¶È¼ì²â
-//            glEnable(GL_DEPTH_TEST);
-//        }
-//
-//
-//        //ÆÁÄ»»æÖÆ
-//        glBindFramebuffer(GL_READ_FRAMEBUFFER, MultiSampleFBO);//´ÓMultiSampleFBOÖĞ¶ÁÈ¡¶à²ÉÑùÖ¡»º³å
-//        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, IntermediateFBO);//ÉèÖÃÄ¿µÄÖ¡»º³åÎªIntermediateFBO
-//        glBlitFramebuffer(0, 0, WindowWidth, WindowHeight, 0, 0, WindowWidth, WindowHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);//½«Ô´Ö¡»º³åÖĞµÄÄÚÈİ½âÎöµ½Ä¿µÄÖ¡»º³åÖĞ(ÒÔ´ËÊ¹ÓÃIntermediateFBOÀ´½øĞĞºó´¦Àí)
-//
-//        glBindFramebuffer(GL_FRAMEBUFFER, 0);//½â°óMultiSampleFBO£¬»Ö¸´µ½Ä¬ÈÏÖ¡»º³å
-//        glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
-//        glStencilFunc(GL_ALWAYS, 1, 0xFF);//Í¨¹ı¼ì²â£¬²»¶ªÆúÆ¬¶Î
-//        glStencilMask(0x00);//²»¸üĞÂ¸ÃÎïÌåËù¶ÔÓ¦µÄÄ£°å»º³åÇø
-//        glDisable(GL_DEPTH_TEST);//ĞèÒªÔİÊ±½ûÓÃÉî¶È¼ì²â£¬ÒòÎªÎÒÃÇÏ£ÍûÖ»¼°½«´øÓĞScreenTextureÎÆÀíµÄScreenMesh»æÖÆµ½ÆÁÄ»ÉÏ£¬ËùÒÔ²»ĞèÒªÉî¶È¼ì²â
-//        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);//Ã»±»ScreenMeshäÖÈ¾µÄµØ·½½«»áÊÇ°×É«µÄ
-//        glClear(GL_COLOR_BUFFER_BIT);
-//
-//        ScreenShader.Use();
-//        glActiveTexture(GL_TEXTURE0);
-//        glBindTexture(GL_TEXTURE_2D, ScreenTexture);//½«ScreenTexture°ó¶¨µ½GL_TEXTURE0ÉÏ
-//        float SharpenKernel[9] = {
-//            -1,-1,-1,
-//            -1, 9,-1,
-//            -1,-1,-1
-//        };//Èñ»¯¾í»ıºË
-//        float BlurKernel[9] = {
-//            1.0 / 16.0, 2.0 / 16.0, 1.0 / 16.0,
-//            2.0 / 16.0, 4.0 / 16.0, 2.0 / 16.0,
-//            1.0 / 16.0, 2.0 / 16.0, 1.0 / 16.0
-//        };//Ä£ºı¾í»ıºË
-//        float NoKernel[9] = {
-//            0.0, 0.0, 0.0,
-//            0.0, 1.0, 0.0,
-//            0.0, 0.0, 0.0
-//        };//²»Ê¹ÓÃÈÎºÎºËĞ§¹û
-//
-//        //Ö÷ÆÁÄ»
-//        glm::mat4 model_Screen = glm::mat4(1.0f);
-//        ScreenShader.setMat4("model", model_Screen);
-//        ScreenShader.SetBool("IfKernel", false);
-//        ScreenShader.SetBool("IfGray", false);
-//        ScreenShader.SetBool("IfInverse", false);
-//        ScreenShader.SetInt("ScreenTexture", 0);
-//        ScreenMesh.Draw(ScreenShader);
-//
-//        //¸±ÆÁÄ»
-//        if (IsKey_M)
-//        {
-//            glm::mat4 model_Screen1 = glm::mat4(1.0f);
-//            model_Screen1 = glm::scale(model_Screen1, glm::vec3(0.25));
-//            model_Screen1 = glm::translate(model_Screen1, glm::vec3(-2.95f, -3.0f, 0.0f));
-//            ScreenShader.setMat4("model", model_Screen1);
-//            ScreenShader.SetBool("IfKernel", true);
-//            ScreenShader.SetBool("IfGray", false);
-//            ScreenShader.SetBool("IfInverse", false);
-//            ScreenShader.SetFloatArray("Kernel", SharpenKernel, 9);
-//            ScreenShader.SetInt("ScreenTexture", 0);
-//            ScreenMesh.Draw(ScreenShader);
-//        }
-//        glEnable(GL_DEPTH_TEST);//»Ö¸´Éî¶È¼ì²â
-//
-//
-//        //½»»»»º³åÇø
-//        glfwSwapBuffers(window);
-//    }
-//
-//    //ÇåÀí
-//    glfwTerminate();
-//    return 0;
-//}
-//
-//
-////´°¿Ú´óĞ¡»Øµ÷º¯Êı
-//void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-//{
-//    if (width == 0 || height == 0) return;//µ±×îĞ¡»¯´°¿ÚµÄÊ±ºò£¬×Ô¶¯ÍË³ö£¬·ÀÖ¹aspectRatioµÃµ½´íÎóµÄ½á¹û
-//    glViewport(0, 0, width, height);
-//
-//    aspectRatio = static_cast<float>(width) / static_cast<float>(height);
-//}
-//
-////Êó±ê»Øµ÷º¯Êı
-//void mouse_callback(GLFWwindow* window, double pos_x, double pos_y)
-//{
-//    float sensitivity = 0.05f;//ÁéÃô¶È
-//
-//    if (FirstMouse)
-//    {
-//        pos_x = (double)LastX;
-//        pos_y = (double)LastY;
-//        FirstMouse = false;
-//    }
-//
-//    if (!glfwGetKey(window, GLFW_KEY_LEFT_ALT) && !glfwGetKey(window, GLFW_KEY_RIGHT_ALT))
-//    {
-//        float offset_x = ((float)pos_x - LastX);
-//        float offset_y = (LastY - (float)pos_y);
-//        LastX = (float)pos_x;
-//        LastY = (float)pos_y;
-//
-//        //°´ÏÂ¹ı²¢ËÉ¿ªAlt
-//        if (IsAlt && IsAltRealise)
-//        {
-//            //°´ÏÂ¹ıAlt²¢ËÉ¿ªºó¶ÔYaw¡¢Pitch½øĞĞRollBack
-//            camera.IfRollBack = true;
-//            IsAlt = false;
-//            IsAltRealise = false;
-//        }
-//
-//        camera.ProcessMouseMove(offset_x, offset_y);
-//    }
-//}
-//
-////¹öÂÖ»Øµ÷º¯Êı
-//void scroll_callback(GLFWwindow* window, double offset_x, double offset_y)
-//{
-//    camera.ProcessMouseScroll((float)offset_x, (float)offset_y);
-//}
-//
-////ÊäÈëº¯Êı
-//void processInput(GLFWwindow* window)
-//{
-//    //¼ì²âESC
-//    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-//    {
-//        glfwSetWindowShouldClose(window, GL_TRUE);
-//    }
-//
-//    //¼ì²âspace
-//    CurrentSpacePressd = (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
-//    if (!LastSpacePressd && CurrentSpacePressd)
-//    {
-//        IsPaused = !IsPaused;
-//    }
-//    LastSpacePressd = CurrentSpacePressd;
-//
-//    //¼ì²âAlt
-//    if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS)
-//    {
-//        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);//ÏÔÊ¾Êó±ê²¢»Ö¸´»î¶¯·¶Î§
-//        IsAlt = true;
-//    }
-//    else
-//    {
-//        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);//Òş²ØÊó±ê²¢½«Êó±êµÄ»î¶¯·¶Î§ÏŞÖÆÔÚ´°¿ÚÄÚ
-//        if (IsAlt)
-//        {
-//            IsAltRealise = true;//µ±°´ÏÂ¹ıAltÖ®ºó£¬ËÉ¿ª²ÅÓĞĞ§(±£Ö¤AltËÉ¿ªÖ®ºóÈÔ±»Ä³¼¸Ö¡¼ì²âµ½µÄÊ±ºò£¬²»»áÉÃ×Ô»Ö¸´½Ç¶È)
-//        }
-//    }
-//
-//    //¼ì²âAWSD
-//    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-//    {
-//        camera.ProcessWASD(FORWARD, PeriodTime);
-//    }
-//    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-//    {
-//        camera.ProcessWASD(BACKWARD, PeriodTime);
-//    }
-//    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-//    {
-//        camera.ProcessWASD(LEFT, PeriodTime);
-//    }
-//    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-//    {
-//        camera.ProcessWASD(RIGHT, PeriodTime);
-//    }
-//
-//    //¼ì²âÉÏÏÂ·½Ïò¼ü
-//    float RateSpeed = 5.0f * PeriodTime;
-//    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-//    {
-//        if (rate < 4.0f)
-//        {
-//            rate += RateSpeed;
-//        }
-//    }
-//    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-//    {
-//        if (rate > -2.0f)
-//        {
-//            rate -= RateSpeed;
-//        }
-//    }
-//
-//    //¼ì²âF¼ü
-//    CurrentKeyPressd_F = (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS);
-//    if (CurrentKeyPressd_F && !LastKeyPressd_F)
-//    {
-//        IsKey_F = !IsKey_F;
-//    }
-//    LastKeyPressd_F = CurrentKeyPressd_F;
-//
-//    //¼ì²âE¼ü
-//    CurrentKeyPressd_E = (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS);
-//    if (CurrentKeyPressd_E && !LastKeyPressd_E)
-//    {
-//        IsKey_E = !IsKey_E;
-//    }
-//    LastKeyPressd_E = CurrentKeyPressd_E;
-//
-//    //¼ì²âM¼ü
-//    CurrentKeyPressd_M = (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS);
-//    if (CurrentKeyPressd_M && !LastKeyPressd_M)
-//    {
-//        IsKey_M = !IsKey_M;
-//    }
-//    LastKeyPressd_M = CurrentKeyPressd_M;
-//}
-//
-//
-//
-////Í¼ÏñÉú³ÉÁ÷³Ì
-////1.¶¥µã×ÅÉ«Æ÷: ¶¥µã×ÅÉ«Æ÷´¦ÀíÃ¿¸ö¶¥µã£¬²¢Êä³öÆäÎ»ÖÃÒÔ¼°ÆäËû¿ÉÄÜµÄÊôĞÔ£¨ÈçÑÕÉ«¡¢·¨ÏßµÈ£©¡£/**¶¥µã×ÅÉ«Æ÷ÖĞÖ»ÓĞ¶¥µãÊı×éÖĞµÄµã£¨Ò»°ãÊÇ±ß½çµã£©
-////2.Í¼Ôª×é×°:Ê¹ÓÃ¶¥µã×ÅÉ«Æ÷Êä³öµÄ¶¥µãĞÅÏ¢×é×°³ÉÒ»¸ö¸öÍ¼Ôª
-////3.¼¸ºÎ×ÅÉ«Æ÷(Èç¹ûÊ¹ÓÃµÄ»°):¶Ô×é×°ºÃµÄÍ¼Ôª½øĞĞĞŞ¸Ä
-////4.¹âÕ¤»¯:OpenGL »á¸ù¾İ¶¥µãµÄÆÁÄ»¿Õ¼ä×ø±êÈ·¶¨Í¼ÔªµÄ±ß½ç£¬²¢¼ÆËã³öËùÓĞÎ»ÓÚÍ¼ÔªÄÚ²¿µÄÆ¬¶Î£¨¼´ÏñËØ£©µÄÎ»ÖÃ¡£
-////5.Æ¬¶Î×ÅÉ«Æ÷:Ã¿¸öÉú³ÉµÄÆ¬¶Î»á´«µİ¸øÆ¬¶Î×ÅÉ«Æ÷(²»Çø·Ö¾ßÌåÍ¼Ôª£¬Ö±½Ó´¦ÀíËùÓĞÍ¨¹ı¹âÕ¤»¯µÄÆ¬¶Î)£¬½øĞĞ½øÒ»²½´¦Àí£¬Èç¼ÆËãÑÕÉ«ºÍ¹âÕÕµÈ¡£ÆÁÄ»(äÖÈ¾»­ÃæÖĞ)ÉÏÓĞ¼¸¸öÏñËØµã¾ÍÔËĞĞ¼¸´ÎÆ¬¶Î×ÅÉ«Æ÷/**Æ¬¶Î×ÅÉ«Æ÷ÖĞÓĞÕâ¸öÍ¼ĞÎµÄËùÓĞÏñËØµã
-////**´Ó¶¥µã×ÅÉ«Æ÷ÏòÆ¬¶Î×ÅÉ«Æ÷´«µİµÄÁ¿¶¼ÊÇ²åÖµºóµÄÁ¿(vShader out FragColor(½öÓĞ¶¥µãÑÕÉ«) -> fShader in FragColor(ÓĞÃ¿¸öÏñËØµãµÄÑÕÉ«))
-////gl_PositonÒ²»á²åÖµºóÔÚÆ¬¶Î×ÅÉ«Æ÷ÖĞ±»Ê¹ÓÃ£¬µ«ÎÒÃÇ²»ĞèÒªÏÔÊ½µØ½ÓÊÕgl_Positon
-//
-////¶¥µãÊı×é¶ÔÏó£¨VAO£©ÔÚOpenGLÖĞ¸ºÔğ½«¶¥µã»º³åÇø¶ÔÏó£¨VBO£©ÖĞµÄÊı¾İ´«µİ¸ø¶¥µã×ÅÉ«Æ÷//
-////Ò»¡¢1.´´½¨Ò»¸ö»º³åÇøVBO      2.¸æËß¸Ã»º³åÇøÈçºÎ´æ´¢Êı¾İ  3.½«Êı¾İ´«µİ¸øVBO£¬
-////¶ş¡¢1.´´½¨Ò»¸ö¡°½âÊÍÆ÷¡±VAO  2.½«¸ÃVAOÉèÖÃÎªµ±Ç°VAO      3.ÉèÖÃVAOÈçºÎ½âÊÍÊı¾İ      4.½«Êı¾İ´«µİ¸ø×ÅÉ«Æ÷
-//
-///*ÎÆÀí*/
-////Ò»¡¢ÎÆÀí»·ÈÆ·½Ê½£º´¦ÀíÎÆÀí×ø±êÔ½½çµÄÇé¿ö
-////¶ş¡¢ÎÆÀí¹ıÂË£º¾ö¶¨²»Í¬ÏñËØÉ«¿éµÄÈ¡Ñù·½Ê½£¨È¡ÁÙ½üÉ«¿é»òÈ¡²åÖµÉ«¿é£©
-////Èı¡¢¶à¼¶½¥Ô¶ÎÆÀí£ºµ±ÉãÏñ»úÀëÎïÌåºÜÔ¶Ê±£¬ºÜÄÑ»ñÈ¡¸ß·Ö±æÂÊµÄÎÆÀí£¬ÓÚÊÇÔ¤ÏÈ´´½¨Ò»¸öMipmap£¨ÓÉºÜ¶à·Ö±æÂÊ²»¶ÏÕÛ°ëµÄÔ­ÎÆÀí×é³É£©£¬È»ºóÈ¡ÁÙ½ü·Ö±æÂÊ»òÈ¡²åÖµ·Ö±æÂÊ
-//
-///*×ø±ê±ä»»*/
-////¾Ö²¿×ø±êÏµ -> (Ä£ĞÍ±ä»») -> ÊÀ½ç×ø±êÏµ -> (ÊÓÍ¼±ä»») -> ¹Û²ì×ø±êÏµ -> (Í¶Ó°±ä»») -> ²Ã¼ô×ø±êÏµ -> (²Ã¼ô+Í¸ÊÓ³ı·¨) -> ¹æ·¶Éè±¸×ø±êÏµ(NDC) -> (ÊÓ¿Ú±ä»») -> ÆÁÄ»×ø±êÏµ -> ½øĞĞÉî¶È²âÊÔµÈäÖÈ¾¹ı³Ì
-////ÊÀ½ç¿Õ¼äÒÔÒ»¸ö¹Ì¶¨µã(0,0,0)Îª×ø±êÏµÔ­µã£¬ÊÓÍ¼¿Õ¼äÒÔÉãÏñ»úÎ»ÖÃÎª×ø±êÏµÔ­µã£¬ÕâÁ½¸ö¿Õ¼ä¶¼ÊÇÏßĞÔ¿Õ¼ä(¶¥µãµÄÏà¶ÔÎ»ÖÃ²»»á¸Ä±ä)£¬²Ã¼ô¿Õ¼ä×ø±êÔ­µãÓëÊÓ×¶Ìå½üÆ½ÃæÖØºÏ(Í¨³£ÉãÏñ»úÓë½üÆ½ÃæºÜ½Ó½ü)£¬ÊÇ·ÇÏßĞÔ¿Õ¼ä
-////Í¶Ó°¾ØÕó½«¶¥µã´ÓÊÓÍ¼¿Õ¼ä±ä»»µ½²Ã¼ô¿Õ¼ä(ÕâÒ»²½½ĞÊÓÍ¼±ä»»),ÊÓÍ¼±ä»»½«¶¥µãÉî¶ÈÖµ(z×ø±êÖµ)½øĞĞ·ÇÏßĞÔËõ·Å(Ä£Äâ½ü´óÔ¶Ğ¡µÄĞ§¹û:Ëæ×ÅÎïÌåÓëÉãÏñ»úµÄ¾àÀëÔö¼Ó£¬ÎïÌåµÄ×ø±êÖµ»áÒÔ·ÇÏßĞÔµÄ·½Ê½ËõĞ¡)£¬¹Ê²Ã¼ô¿Õ¼äÊÇÒ»¸ö·ÇÏßĞÔ¿Õ¼ä(Ô­±¾¶¥µãµÄÏà¶ÔÎ»ÖÃ·¢ÉúÁË±ä»¯)
-////±ä»»µ½²Ã¼ô¿Õ¼äÖ®ºó»áÓÉOpenGL×Ô¶¯Íê³É²Ã¼ôºÍÍ¸ÊÓ³ı·¨(ÒÀ¿¿Æë´Î×ø±êw)£¬½«¶¥µã±ä»»µ½NDCÖĞ£¬´ËÊ±x/y/zµÄÖµ¶¼ÔÚ(-1,1)Ö®¼ä
-//
-///*Æë´Î×ø±ê·ÖÁ¿w*/
-//// ÔÚ²Ã¼ô¿Õ¼äÖĞwÓÉÉãÏñ»úÎ»ÖÃ¡¢½üÔ¶²Ã¼ôÃæµÈ¼ÆËãµÃ³ö
-////1.Í¸ÊÓ³ı·¨£ºÔÚ½«²Ã¼ô¿Õ¼äµÄ×ø±ê×ª»»Îª±ê×¼»¯Éè±¸×ø±ê£¨NDC£©Ê±£¬x¡¢y ºÍ z »á·Ö±ğ³ıÒÔ w¡£ÕâÒ»²½ÖèÈ·±£ÁËÍ¸ÊÓĞ§¹ûµÄÕıÈ·ĞÔ¡£
-////2.Éî¶ÈÅĞ¶Ï£ºÔÚÉî¶È²âÊÔÖĞ£¬z ×ø±êµÄÖµ»áÓë w ½áºÏÊ¹ÓÃ£¬°ïÖúÈ·¶¨ÄÄ¸öÆ¬ÔªÊÇ¿É¼ûµÄ¡£Í¨¹ıÉî¶È»º³åÇø´æ´¢¹éÒ»»¯ºóµÄÉî¶ÈÖµ£¬È·±£³¡¾°ÖĞµÄÎïÌå°´ÕÕ¾àÀëÕıÈ·äÖÈ¾¡£
-////3.²Ã¼ô£ºÔÚ²Ã¼ô¹ı³ÌÖĞ£¬w ÓÃÓÚÅĞ¶Ï¶¥µãÊÇ·ñÔÚ²Ã¼ô¿Õ¼äµÄÓĞĞ§·¶Î§ÄÚ£¨¼´ - w µ½ w£©¡£Èç¹ûÄ³¸ö¶¥µãµÄ x / w¡¢y / w »ò z / w ³¬³öÕâ¸ö·¶Î§£¬Ôò¸Ã¶¥µã»á±»²Ã¼ôµô¡£
-//
-///*´°¿Ú¡¢ÊÓ¿ÚÓë»­Ãæ*/
-////1.´°¿ÚÏàµ±ÓÚÏà¿ò£¬ÊÓ¿ÚÏàµ±ÓÚÏà¿òÖĞµÄ»­Ö½£¬äÖÈ¾µÄÍ¼ĞÎ¾ÍÊÇ»­Ö½ÉÏµÄÄÚÈİ 
-////2.Í¸ÊÓ¾ØÕóÖĞµÄ¿í¸ß±È¾ÍÊÇ»­Ö½ÉÏÄÚÈİµÄ¿í¸ß±È£¬ÏëÈÃ´°¿Ú´óĞ¡µ÷ÕûÊ±»­Ãæ±ÈÀı²»±ä£¬¾ÍÒªÔÚ¸Ä±ä´°¿Ú´óĞ¡µÄ¸Ä±äÍ¸ÊÓ¾ØÕó¿í¸ß±È
-////Èç¹û¶¥µãÊı×éÖĞµÄÓÒÉÏ½ÇµÄaPosÆ¥ÅäµÄÎÆÀí×ø±êÊÇ(1,1),´ú±íÎÆÀíÍ¼Æ¬µÄÓÒÉÏ½ÇµÄÏñËØ½«»áÓëÓÒÉÏ½ÇaPosÎ»ÖÃµÄÏñËØÖØºÏ£»Èç¹ûÎÆÀí×ø±êÊÇ(0.5,0.5)£¬ÔòÓÒÉÏ½ÇaPosÎ»ÖÃµÄÏñËØ»áÊÇÎÆÀíÍ¼Æ¬µÄÖĞĞÄµãÏñËØ 
-//
-///*Ê¹ÓÃ²»Í¬µÄVAO¡¢×ÅÉ«Æ÷»æÖÆ²»Í¬Í¼ĞÎ*/
-////Ò»¡¢Èç¹ûÏëÊ¹ÓÃ²»Í¬µÄ¶¥µãÊı×é»æÖÆ²»Í¬µÄÍ¼ĞÎ£¬ÔòĞèÒªÉèÖÃ²»Í¬µÄVAO
-////¶ş¡¢Èç¹ûÏëÊ¹ÓÃ²»Í¬µÄäÖÈ¾·½Ê½»æÖÆ²»Í¬µÄÍ¼ĞÎ£¬ÔòĞèÒªÉèÖÃ²»Í¬µÄ×ÅÉ«Æ÷³ÌĞò£¨Ö÷Ìå¶¼ÊÇShader.h,µ«¾ßÌåµÄ¶¥µã×ÅÉ«Æ÷ºÍÆ¬¶Î×ÅÉ«Æ÷ÓĞËù²»Í¬£©
-////Èı¡¢´´ÔìµÄÁ½¸ö×ÅÉ«Æ÷Ö®¼ä»¥Ïà¶ÀÁ¢£¬×ÅÉ«Æ÷³ÌĞòÖĞµÄ±äÁ¿Öµ»¥²»¼Ì³Ğ£¬Èç¹ûÃ»ÓĞÉèÖÃÄ³¸ö×ÅÉ«Æ÷³ÌĞòÖĞµÄ±äÁ¿£¬ÔòÕâ¸ö±äÁ¿ÎªÄ¬ÈÏÖµ0£¨´ó¸ÅÂÊ£©
-////ËÄ¡¢»æÖÆµÚ¶ş¸öÍ¼ĞÎÊ±£¬ĞèÒªµÚ¶ş¸ö²»Í¬µÄÄ£ĞÍ¾ØÕómodel2²¢ÓÃµÚ¶ş¸ö×ÅÉ«Æ÷myshader2À´½«Æä´«Èë×ÅÉ«Æ÷³ÌĞò£¬µ«ÊÓÍ¼¾ØÕóºÍÍ¸ÊÓ¾ØÕó²»ĞèÒª¶îÍâ¶¨Òå£¬Ö±½ÓÓÃview1ºÍprojection1¼´¿É£¬°ó¶¨µÚ¶ş¸öÍ¼ĞÎµÄVAO2½øĞĞ»æÖÆ
-//
-///*Éî¶È»º³å*/
-////1.Éî¶È²âÊÔÔÚÆ¬¶Î×ÅÉ«Æ÷Ö®ºó¡¢×îÖÕÑÕÉ«Ğ´ÈëÑÕÉ«»º³åÖ®Ç°½øĞĞ
-////2.Éî¶È²âÊÔ½«µ±Ç°Æ¬¶ÎµÄÉî¶ÈÖµ¸úÉî¶È»º³åÖĞµÄÉî¶ÈÖµ½øĞĞ±È½Ï£¬Í¨¹ıÉî¶È²âÊÔµÄÆ¬¶ÎÉî¶ÈÖµ±»¸üĞÂµ½Éî¶È»º³åÇøÖĞ 
-////3.×îÖÕ²»ÔÙÉî¶È»º³åÇøÖĞµÄÆ¬¶Î²»»á±»äÖÈ¾£¨¼´±»ÕÚµ²£©£¬µ«ÎÒÃÇÈÔ¼ÆËãÁËÆäÆ¬¶ÎµÄÈ«²¿Êı¾İ£¨¿ÉÓÃ¡°ÌáÇ°Éî¶È²âÊÔ¡±ÓÅ»¯£©
-////4.Éî¶ÈÖµ¾«¶È£º½«¹Û²ì¿Õ¼äÖĞµÄzÖµ£¨½éÓÚÊÓ×¶Ìå½üÆ½ÃæºÍÔ¶Æ½ÃæÖĞ¼äµÄÄ³¸öÖµ£©±ä»»µ½Éî¶È»º³åÇøÖĞ£¨±ä»»µ½0.0ÖÁ1.0Ö®¼ä£©£¬³£Ê¹ÓÃ·ÇÏßĞÔ·½³Ì£¨ÀëÆÁÄ»½üµÄ»­Ãæz¾«¶È¸ü¸ß£¬¸üÒ×ÓÚÇø·ÖÇ°ºó¹ØÏµ£©
-//
-///*ÑÕÉ«»º³å¡¢Éî¶È²âÊÔ¡¢Ä£°å²âÊÔ*/
-////1.ÑÕÉ«»º³åºÍÉî¶È²âÊÔµÄ¸üĞÂÍ¨³£ÊÇÔÚËùÓĞÆ¬¶ÎäÖÈ¾Íê³ÉÖ®ºóÍ³Ò»½øĞĞµÄ£¬Á½ÖÖ²âÊÔÆ½ĞĞ½øĞĞ£¬Ö»ÓĞÁ½ÖÖ²âÊÔ¶¼Í¨¹ıµÄÆ¬¶Î²Å»á±»·ÅÈëÑÕÉ«»º³åÇøÖĞ
-////2.Ä£°å²âÊÔÔòÊÇÔÚÃ¿Ò»¸öÎïÌåäÖÈ¾ºó£¨µÃµ½Æ¬¶Îºó£©½øĞĞµÄ¡£¼´äÖÈ¾Ò»¸öÎïÌå¾Í½øĞĞÒ»´ÎÄ£°å²âÊÔ¡£ËùÓĞäÖÈ¾µÄÎïÌå¹«ÓÃÒ»¸öÄ£°å»º³åÇø
-////3.Ä£°å»º³åÇøºÍÆÁÄ»Ïà¶ÔÓ¦£¬ÆÁÄ»ÉÏÃ¿Ò»¸öÏñËØµã¶¼ÔÚÄ£°å»º³åÇøÖĞ´æÓĞÒ»¸ö8Î»µÄÄ£°åÖµ¡£
-////5.ÈôÎïÌåÔÚÆÁÄ»µÄ×óÏÂ½Ç»æÖÆ£¬ÔòÎïÌåµÄÄ£°åÖµÒ²ÔÚÄ£°å»º³åÇø(¶ÔÓ¦µÄÆÁÄ»ÏñËØÎ»ÖÃ)µÄ×óÏÂ½Ç¡£Ä£°å¼ì²âÊ±Ò²Ö»¼ì²âÎïÌåÔÚ»º³åÇøÖĞ¶ÔÓ¦µÄÄ£°åÖµ¡£
-////6.Ä£°å»º³åÇøÖĞµÄÄ£°åÖµÄ¬ÈÏÎª0
-////7.Ä£°å»º³åÇøÇåÁãglClear(GL_STENCIL_BUFFER_BIT)»áÊÜµ½Ä£°åÑÚÂëµÄÓ°Ïì£¬Èç¹ûÒÑ¾­ÉèÖÃÁËglStencilMask(0x00)£¬ÔòÎŞ·¨ÇåÁã
-////8.Ä£°å²âÊÔ£ºÆô¶¯Ä£°å²âÊÔ -> ÉèÖÃÄ£°åº¯Êı(¾ö¶¨½øĞĞÄ£°å²âÊÔµÄÌõ¼ş)¡¢Ä£°å²Ù×÷(¾ö¶¨ÈçºÎ¸üĞÂÄ£°åÖµ) -> ÉèÖÃÄ£°åÑÚÂë(¾ö¶¨Ä£°åÖµµÄÄÄĞ©Î»±»ĞŞ¸Ä£¬Ä£°åº¯ÊıÖĞÑÚÂë¾ö¶¨ÄÄ¼¸Î»±»²âÊÔ) -> äÖÈ¾ÎïÌå(´ËÊ±Ä£°å»º³åÇø»á¸ù¾İÄ£°å²âÊÔºÍ²Ù×÷¸üĞÂ)
-////9.×îºÃÔÚÆäËûÎïÌåäÖÈ¾ÍêÖ®ºóÔÙäÖÈ¾±ß¿ò£¬ÕâÑù²ÅÄÜÊ¹±ß¿ò²»»á±»ÆäËûÎïÌå(Éî¶ÈÖµ¸üĞ¡µÄ)¸²¸Ç
-////10.¸úÉî¶È²âÊÔ¡¢Ä£°å²âÊÔÓĞ¹ØµÄ²Ù×÷(ÆôÓÃ²Ù×÷¡¢Func²Ù×÷¡¢ÑÚÂë²Ù×÷¡¢OP²Ù×÷)¶¼ÊÇÈ«¾ÖµÄ£¬µ±Ç°°ó¶¨ÄÄ¸öÖ¡»º³åËü¾ÍÔÚÄÄ¸öÖ¡»º³åÏÂ¹¤×÷
-////11.¹ØÓÚglStencilOp()£º
-////(*¼ÙÉèÎÒÃÇÍ¸¹ıÕÚµ²Îï¿´Ä£ĞÍ) 
-////(1).µ±ÏÈäÖÈ¾Ä£ĞÍºóäÖÈ¾ÕÚµ²ÎïÊ±£¬´ËÊ±Ä£ĞÍµÄÄ£°å¼ì²âºÍÉî¶È¼ì²â¾ùÍ¨¹ı£¬µ÷ÓÃµÄÊÇµÚÈı¸ö²ÎÊı£¬¹ÊµÚÈı¸ö²ÎÊıĞèÒªµ÷ÕûÎªGL_REPLACE²ÅÄÜ½«Ä£ĞÍ¶ÔÓ¦Î»ÖÃµÄÄ£°åÖµÉèÖÃÎª1
-////(2).µ±ÏÈäÖÈ¾ÕÚµ²ÎïºóäÖÈ¾Ä£ĞÍÊ±£¬´ËÊ±Ä£ĞÍÖ»ÄÜÍ¨¹ıÄ£°å¼ì²âÎŞ·¨Í¨¹ıÉî¶È¼ì²â,µ÷ÓÃµÄÊÇµÚ¶ş¸ö²ÎÊı£¬¹ÊµÚ¶ş¸ö²ÎÊıĞèÒªµ÷ÕûÎªGL_REPLACE²ÅÄÜ½«Ä£ĞÍ¶ÔÓ¦Î»ÖÃµÄÄ£°åÖµÉèÖÃÎª1¡£Èç¹ûÉèÖÃ³ÉGL_KEEP£¬ÔòÄ£ĞÍ¶ÔÓ¦Î»ÖÃÄ£°åÖµÈÔÎª0                       
-////(3).ÈôÏë²»¿¼ÂÇÄ£ĞÍºÍÕÚµ²ÎïµÄäÖÈ¾Ë³ĞòÒÀÈ»ÄÜ´ïµ½ÏëÒªµÄ½á¹û£¬ÔòµÚ¶ş¸öºÍµÚÈı¸ö²ÎÊı¾ùÉèÖÃÎªGL_REPLACE
-//
-///*»ìºÏ²âÊÔ*/
-////1.¶ÔÓÚÈ«Í¸Ã÷ÎïÌå(²İÎÆÀíµÄ±ß¿ò)£º²»ĞèÒª»ìºÏ²âÊÔ£¬Ö±½Ó¶ªÆúÏàÓ¦Í¸Ã÷¶ÈµÄÆ¬¶Î¼´¿É
-////2.¶ÔÓÚ°ëÍ¸Ã÷ÎïÌå£ºÊ¹ÓÃ»ìºÏ²âÊÔ£¬È·±£ÏÈäÖÈ¾²»Í¸Ã÷µÄÎïÌåÔÙäÖÈ¾°ëÍ¸Ã÷µÄÎïÌå£¬ÏÈäÖÈ¾Ô¶´¦µÄ°ëÍ¸Ã÷ÎïÌåÔÙäÖÈ¾½ü´¦µÄ°ëÍ¸Ã÷ÎïÌå
-//
-///*Ö¡»º³å*/
-////Ä¬ÈÏÖ¡»º³å£ºÓÉ´°¿ÚÏµÍ³Ìá¹©µÄÖ¡»º³å£¬ÓëÆÁÄ»ÏÔÊ¾Ïà¹ØÁª£¬ÊÇäÖÈ¾ÎïÌåµÄ×îºóÒ»²½
-////ÀëÆÁÖ¡»º³å£ºÊÖ¶¯´´½¨G_Buffer£¬²»Ö±½ÓÓÚÆÁÄ»ÏÔÊ¾¹ØÁª£¬ÓÃÓÚÖĞ¼ääÖÈ¾¹ı³ÌÊµÏÖÆäËûäÖÈ¾Ğ§¹û
-//// Ò»¡¢¿ÉÒÔÊ¹ÓÃÄ¬ÈÏÖ¡»º³å½«½á¹ûÖ±½ÓäÖÈ¾µ½ÆÁÄ»ÉÏ
-//// ¶ş¡¢»òÕßÊ¹ÓÃÊ¹ÓÃÀëÆÁÖ¡»º³å½«½á¹û(¾ÍÊÇ±¾À´ÆÁÄ»ÉÏ»á³öÏÖµÄÄÚÈİ)ÏÈäÖÈ¾µ½×Ô½¨G_BufferµÄÑÕÉ«ÎÆÀí¸½¼şÖĞ(´ËÊ±¾ÍÏàµ±ÓÚ°ÑÔ­±¾Õû¸öÆÁÄ»ÉÏµÄÄÚÈİ×ö³ÉÒ»ÕÅÌùÍ¼)£¬
-//// ÔÙ½«G_BufferÖĞµÄÄÚÈİ´¦ÀíÖ®ºóÔÙäÖÈ¾µ½ÆÁÄ»ÉÏ(ĞèÒªÁíÒ»¸öÔØÌåÀ´³Ğµ£Õâ¸öÌùÍ¼)
-//// 
-////Ö¡»º³åÎÆÀí£º
-////ÔÚ OpenGL ÖĞ£¬Í¨³£ĞèÒªÔÚ GPU ÉÏ×¼±¸Á½¸öÎÆÀíÎ»ÖÃ£º
-////Ò»¸öÎÆÀíÎ»ÖÃ×÷Îª¶ÁÈëÄ¿±ê£ºÓÃÓÚ¶ÁÈ¡Êı¾İ£¬Í¨³£ÊÇÔÚºó´¦Àí¡¢¼ÆËã¡¢»òÕßÊ¹ÓÃÖ®Ç°äÖÈ¾½á¹ûµÄ³¡¾°ÖĞ¡£ÀıÈç£¬ºó´¦ÀíĞ§¹û»áÊ¹ÓÃäÖÈ¾½á¹ûÎÆÀí×÷ÎªÊäÈë¡£
-////Ò»¸öÎÆÀíÎ»ÖÃ×÷ÎªĞ´ÈëÄ¿±ê£º¼´Ö¡»º³åµÄ¸½¼ş¡£Õâ¸öÎÆÀíÓÃÓÚ´æ´¢äÖÈ¾²Ù×÷µÄ½á¹û£¬äÖÈ¾µÄÍ¼Ïñ»á±»Ğ´Èëµ½Õâ¸öÎÆÀíÖĞ£¬¶ø²»ÊÇÖ±½ÓÏÔÊ¾µ½ÆÁÄ»ÉÏ¡£
-////ÔÚÒ»¸ö Ö¡»º³å¶ÔÏó£¨Framebuffer, FBO£© ÖĞ£¬¿ÉÒÔÓĞ¶à¸ö¸½¼ş£¬°üÀ¨£º
-////¶à¸öÎÆÀí¸½¼ş£¨¿ÉÒÔÊÇÑÕÉ«ÎÆÀí¸½¼ş¡¢Éî¶ÈÎÆÀí¸½¼ş¡¢Ä£°åÎÆÀí¸½¼ş£©¡¢Ò»¸öÉî¶È¸½¼ş ¡¢ Ò»¸öÄ£°å¸½¼ş¡£
-//// 
-////ÎÆÀí¸½¼ş£º
-////ÎÆÀí¸½¼ş¿ÉÒÔ·ÖÎª¶àÖÖÀàĞÍ£¬ÀıÈç£ºÑÕÉ«ÎÆÀí¸½¼ş¡¢Éî¶ÈÎÆÀí¸½¼ş¡¢Ä£°åÎÆÀí¸½¼ş
-////ÎÆÀí¸½¼şÖ»ÊÇÒ»¸öÍ³³Æ£¬Êµ¼ÊÉÏ¾ßÌåµÄÑÕÉ«Êı¾İ¡¢Éî¶ÈÎÆÀíÊı¾İ¡¢Ä£°åÎÆÀíÊı¾İ¶¼´æÔÚÎÆÀí¸½¼şÏÂµÄÑÕÉ«¸½¼ş¡¢Éî¶ÈÎÆÀí¸½¼ş¡¢Ä£°åÎÆÀí¸½¼şÖĞ
-////Éî¶È¸½¼şÓëÉî¶ÈÎÆÀí¸½¼ş£¬Ä£°å¸½¼şÓëÄ£°åÎÆÀí¸½¼ş£º
-////Éî¶È¸½¼ş or Ä£°å¸½¼ş£ºÓÉÉî¶È»º³åÇø¡¢Ä£°å»º³åÇø´´½¨£¬Ö»ÄÜÓÃÓÚÉî¶È¼ì²âºÍÄ£°å¼ì²â£¬¾ßÌåÊı¾İÎŞ·¨±»²ÉÑù
-////Éî¶ÈÎÆÀí¸½¼ş or Ä£°åÎÆÀí¸½¼ş£ºÓÉÎÆÀí´´½¨£¬²»½öÄÜ´æ´¢Éî¶ÈĞÅÏ¢ºÍÄ£°åĞÅÏ¢£¬»¹ÄÜ±»²ÉÑùÊ¹ÓÃ£¬Íê³Éºó´¦ÀíĞ§¹û
-//
-///*Á¢·½ÌåÌùÍ¼*/
-////Ìì¿ÕºĞ£º
-////Ò»¡¢Ê¹ÓÃglm::mat4(glm::mat3(view))È¥³ıÆ½ÒÆ£¬ÕâÑù²»¹ÜÊÇ·ñÒÆ¶¯£¬ÉãÏñ»úµÄÎ»ÖÃÊ¼ÖÕÔÚ×ø±êÔ­µã£¬Ê¼ÖÕÔÚÌì¿ÕºĞÄÚ²¿
-////¶ş¡¢Ò»Ö±³¯Ò»¸ö·½ÏòÒÆ¶¯ÆäËûÎïÌå£¬¼´Ê¹ÊÓ×¶ÌåÉèÖÃµÃºÜ´ó£¬ÎïÌåÈÔÈ»ÓĞ¿ÉÄÜÒÆ³öÌì¿ÕºĞµÄ·¶Î§¡£µ«ÓÉÓÚÎÒÃÇ½ûÓÃÁËÌì¿ÕºĞµÄÉî¶ÈĞ´Èë£¬
-////Ìì¿ÕºĞ»áÊ¼ÖÕ±»»æÖÆÔÚ³¡¾°µÄ×îÔ¶´¦(Éî¶ÈÖµÎª1.0£¬×îÔ¶Éî¶È)£¬¶ø²»»á¸²¸ÇÆäËûÎïÌå£¬ËùÒÔ¼´Ê¹ÎïÌåÒÆ³öÁËÌì¿ÕºĞµÄ·¶Î§£¬Ìì¿ÕºĞÒÀÈ»»áÔÚäÖÈ¾Ê±¸²¸ÇÕû¸ö±³¾°¡£
-////Èı¡¢Èç¹ûÎÒÃÇµÚÒ»¸öäÖÈ¾Ìì¿ÕºĞÇÒ½ûÓÃÉî¶ÈĞ´Èë£¬Ôò²»»á¸²¸ÇºóäÖÈ¾µÄÎïÌå£¬µ«ÔÚºóĞøäÖÈ¾ÆäËûÎïÌåÊ±»¹ĞèÒª¶ªÆú±»ÕÚµ²µÄÌì¿ÕºĞÆ¬¶Î£¬
-////ËùÒÔÎÒÃÇ¿ÉÒÔ×îºóäÖÈ¾Ìì¿ÕºĞ²¢ÈÃOpenGLÊ¼ÖÕÈÏÎªÌì¿ÕºĞµÄÉî¶ÈÖµÎª1.0(×îÔ¶Éî¶ÈÖµ)
-////ËÄ¡¢Èç¹ûÎÒÃÇÔÚÏëÔÚÈÎÒâË³ĞòäÖÈ¾Ìì¿ÕºĞ(ÓÅ»¯¼õÉÙÆ¬¶ÎäÖÈ¾Á¿)£¬ÔòĞèÒªÔİÊ±½«Éî¶È¼ì²âº¯ÊıÉèÎªLEAQAL,±£Ö¤Ìì¿ÕºĞ½öÔÚÉĞÎ´ÆÁÄ»ÖĞäÖÈ¾¹ıÎïÌåµÄÎ»ÖÃÍ¨¹ıÉî¶È¼ì²â£¬Í¬Ê±½«ÕâĞ©Î»ÖÃÉî¶ÈÖµ¸ÄÎª1.0(ËäÈ»±¾À´¾ÍÊÇ1.0)
-//
-///*¼¸ºÎ×ÅÉ«Æ÷*/
-////Ò»¡¢¼¸ºÎ×ÅÉ«Æ÷´¦ÓÚ¶¥µã×ÅÉ«Æ÷ºÍÆ¬¶Î×ÅÉ«Æ÷Ö®¼ä(ÈôÃ»ÓĞÏÔÊ½±àĞ´¼¸ºÎ×ÅÉ«Æ÷Ôò²»»áÊ¹ÓÃ)£¬ÓÃÓÚÉú³ÉĞÂµÄ¶¥µãºÍĞŞ¸ÄÒÑÓĞµÄÍ¼Ôª
-////¶ş¡¢layout () inÉêÃ÷´Ó¶¥µã×ÅÉ«Æ÷½ÓÊÕµÄÍ¼ÔªÀàĞÍ£¬layout () outÉêÃ÷Êä³ö¸øÆ¬¶Î×ÅÉ«Æ÷µÄÍ¼ÔªÀàĞÍºÍ×î´ó¶¥µãÊı
-////Èı¡¢EmitVertex():Êä³öĞÂµÄ¶¥µã;EndPrimitive():ËùÓĞ±»EmitVertexÊä³öµÄ¶¥µã»á±»ºÏ³ÉÎªÎÒÃÇÔÚlayout () outÖĞÖ¸¶¨¹ıµÄÍ¼ĞÎ
-////ËÄ¡¢Èç¹ûÎÒÃÇÆôÓÃÁË¼¸ºÎ×ÅÉ«Æ÷£¬ÄÇÃ´´Ó¶¥µã×ÅÉ«Æ÷ÖĞoutµÄ±äÁ¿±ØĞëÒªÒÀ¿¿¼¸ºÎ×ÅÉ«Æ÷µÄ¼ä½Ó´«µİ²ÅÄÜÔÚÆ¬¶Î×ÅÉ«Æ÷ÖĞ½ÓÊÕ
-////Îå¡¢´Ó¶¥µã×ÅÉ«Æ÷Ïò¼¸ºÎ×ÅÉ«Æ÷´«µİÊı¾İ¶¼ÊÇÒ»×éÒ»×é´«µİµÄ£¬Ã¿Ò»×é°üº¬Ò»¸öÍ¼ÔªËùÓĞµÄËùÓĞ¶¥µãÊı¾İ(Î»ÖÃ¡¢·¨ÏòÁ¿¡¢ÎÆÀí×ø±êµÈ)
-////Áù¡¢¿ÉÒÔÀí½âÎª¼¸ºÎ×ÅÉ«Æ÷ÖĞÓÖ°üº¬ÁËÒ»¸öÍ¼Ôª¶¥µãÊıÄ¿¸öÊıµÄ¶¥µã×ÅÉ«Æ÷
-////Æß¡¢¶¥µã×ÅÉ«Æ÷ÖĞµÄgl_PositionËã³öÀ´ÊÇÄÄ¸ö¿Õ¼äµÄ£¬¼¸ºÎ×ÅÉ«Æ÷¾ÍÔÚÄÄ¸ö¿Õ¼ä½øĞĞÏÂÒ»²½¼ÆËã
-////°Ë¡¢¿ÉÒÔÔÚ¶¥µã×ÅÉ«Æ÷ÖĞ½«gl_Positon±ä»»µ½²Ã¼ô¿Õ¼ä£¬Ò²¿ÉÒÔÏÈÔÚ¶¥µã×ÅÉ«Æ÷ÖĞ½«gl_Position±ä»»µ½¹Û²ì¿Õ¼äÈ»ºóÔÚ¼¸ºÎ×ÅÉ«Æ÷ÖĞ½øĞĞÆäËû´¦ÀíÔÙ½«Æä±ä»»µ½²Ã¼ô¿Õ¼ä
-///*¾Å¡¢Èç¹ûÒªÔÚ¼¸ºÎ×ÅÉ«Æ÷ÖĞÊ¹ÓÃ¶¥µã(gl_Position)Ö®¼äµÄÏßĞÔ¹ØÏµÀ´¼ÆËãÆäËûÁ¿(Èç·¨Ïß)Ê±£¬ÒªÈ·±£´Ó¶¥µã×ÅÉ«Æ÷ÖĞ»ñÈ¡µÄgl_PositonÊÇ¹Û²ì¿Õ¼äÖĞµÄÁ¿£¬¼ÆËãÍê»¹ÒªÔÙ°Ñgl_Positon×ª»»µ½²Ã¼ô¿Õ¼äÖĞ*/
-//
-///*ÊµÀı»¯*/
-////Ò»¡¢uniformÊı¾İÔÚËùÓĞÊµÀıÖĞ¹²Ïí(²»Ê¹ÓÃÊµÀı»¯»æÖÆn¸öÎïÌå:Ã¿Ò»Ö¡ÏòglslÉÏ´«n¸öuniformÖµ;Ê¹ÓÃÊµÀı»¯»æÖÆn¸öÎïÌå:Ã¿Ò»Ö¡ÏòglslÉÏ´«1¸öuniformÖµ)
-////¶ş¡¢ÔÚ»æÖÆ¶à¸öÊµÀıÊ±Èç¹ûÏ£ÍûÓÃ²»Í¬µÄmodel¾ØÕó½øĞĞÎ»ÖÃµ÷Õû£¬Èç¹ûÊ¹ÓÃuniformÊı×éµÄ»°¿ÉÄÜ»á³¬³ö×î´óuniformÊıÁ¿£¬¹ÊÓ¦²ÉÓÃÊµÀı»¯Êı×é(½«modelÉèÖÃÎª¶¥µãÊôĞÔ:¶¥µãÊôĞÔÔÚ»æÖÆÒ»¸öĞÂµÄÊµÀıÊ±²Å»á±»¸üĞÂ)
-////Èı¡¢Ê¹ÓÃÊµÀı»¯Êı×é°ÑÄ£ĞÍ¾ØÕó(»òÆäËûÊı¾İ)´«µİ¸ø¶¥µãÊôĞÔÊ±±ØĞëÔÚäÖÈ¾Ñ­»·Íâ½øĞĞ
-//
-///*¿¹¾â³İ*/
-////Ò»¡¢¾â³İ²úÉúÔ­Òò:Ã¿¸öÏñËØÖĞÖ»ÓĞÒ»¸ö²ÉÑùµã£¬µ±Ä³¸öÍ¼Ôª¸²¸ÇÕâ¸ö²ÉÑùµãÊ±¸ÃÏñËØ±»ÉèÖÃ³É¸ÃÍ¼ÔªµÄÑÕÉ«£¬·ñÔòÔòÎªÔ­±¾µÄÑÕÉ«(¿ÉÄÜÊ±ÏÈÇ°±»ÆäËûÍ¼ÔªäÖÈ¾¹ıµÄÑÕÉ«)
-////¶ş¡¢³¬²ÉÑù¼¼Êõ:½«Ô­±¾Òª»æÖÆµÄÍ¼ÏñÒÔ¸ü¸ßµÄ·Ö±æÂÊ½øĞĞ»æÖÆ£¬Ö®ºóÔÙ½«ÆäËõĞ¡µ½ÎÒÃÇËùĞèµÄ·Ö±æÂÊ
-////Èı¡¢¶àÖØ²ÉÑù¼¼Êõ(Î´ÆôÓÃÑù±¾×ÅÉ«):¶ÔÃ¿¸öÏñËØÖ»ÔËĞĞÒ»´ÎÆ¬¶Î×ÅÉ«Æ÷£¬Ã¿¸öÏñËØÖĞÓĞ¶à¸ö²ÉÑùµã£¬×îÖÕ¸ÃÏñËØµÄÑÕÉ«Îª¸÷¸ö²ÉÑùµãµÄÑÕÉ«µÄ¾ùÖµ(ĞèÒªÒ»¸öÄÜ´æ´¢¶à¸öÑÕÉ«µÄÑÕÉ«»º³åÇøÀ´¼ÇÂ¼Ã¿¸ö²ÉÑùµã(²ÉÑùµ½µÄ)µÄÑÕÉ«)¡£²»ĞèÒª¶îÍâµÄÉî¶È»º³åÇøºÍÄ£°å»º³åÇø(Ò»¸öÏñËØÖĞµÄÃ¿¸ö²ÉÑùµãµÄÉî¶ÈÖµºÍÄ£°åÖµ¶¼ÏàÍ¬)
-////(ÆôÓÃÑù±¾×ÅÉ«):¶ÔÃ¿¸öÏñËØÖĞµÄÃ¿¸ö²ÉÑùµã¶¼ÔËĞĞÒ»´ÎÆ¬¶Î×ÅÉ«Æ÷£¬ÈÔĞèÒªÒ»¸öÄÜ´æ´¢¶à¸öÑÕÉ«µÄÑÕÉ«»º³åÇøÀ´¼ÇÂ¼Ã¿¸ö²ÉÑùµã(²ÉÑùµ½µÄ)µÄÑÕÉ«£¬Ö»²»¹ı×îÖÕÏñËØÑÕÉ«²»×öÇóºÍ¶øÊÇÖ±½ÓÊä³öÃ¿¸ö²ÉÑùµãµÄÑÕÉ«¡£
-////ËÄ¡¢ÀëÆÁ¶àÖØ²ÉÑù¼¼Êõ:²»ÔÙĞèÒª¶îÍâµÄÑÕÉ«»º³åÇø£¬¶øÊÇĞèÒª¶îÍâµÄ¶àÖØ²ÉÑùÎÆÀíÑÕÉ«ÎÆÀí¸½¼ş(Ä³ÖÖÒâÒåÉÏ½²¾ÍÏàµ±ÓÚÑÕÉ«»º³åÇø)¡£Í¬Ê±Ò²ĞèÒª¶îÍâµÄÉî¶ÈÄ£°åÎÆÀí¸½¼ş(ËäÈ»Í¬Ò»¸öÏñËØÖĞµÄ²ÉÑùµãµÄÉî¶ÈÄ£°åÖµ¶¼ÏàÍ¬£¬µ«ÈÔ»á¶ÔÃ¿Ò»¸ö²ÉÑùµã¶¼½øĞĞÉî¶ÈÄ£°å¼ì²â)
-////¶àÖØ²ÉÑùÎÆÀí¸½¼ş²»Í¬ÓÚÆÕÍ¨µÄÑÕÉ«ÎÆÀí¸½¼ş£¬ËüÎŞ·¨Ö±½Ó±»·ÃÎÊ£¬±ØĞëÒÀ¿¿glBlitFramebufferÀ´½«Æä½âÎöµ½ÁíÒ»¸öÆÕÍ¨µÄÖ¡»º³å(ÆÕÍ¨ÑÕÉ«ÎÆÀí¸½¼ş)ÖĞ²ÅÄÜ·ÃÎÊ(¶ÔÕâ¸öÑÕÉ«¸½¼ş½øĞĞºó´¦ÀíµÈ×ÅÉ«Æ÷²Ù×÷)
-////¾ßÌåÁ÷³Ì:ÏÈ½«³¡¾°äÖÈ¾µ½¶àÖØ²ÉÑùÎÆÀíÖĞ£¬È»ºó½âÎö¸Ã¶àÖØ²ÉÑùÎÆÀíÎªÆÕÍ¨µÄÎÆÀí£¬ÔÙ½«½âÎöºóµÄÆÕÍ¨ÎÆÀí»æÖÆµ½Ò»¸öËÄ±ßĞÎÉÏ²¢ÏÔÊ¾ÔÚÆÁÄ»ÉÏ¡£
-//
-//
-//
-//
-//
+#define STB_IMAGE_IMPLEMENTATION
+#include <iostream>
+#include <vector>
+#include <chrono>
+#include <map>
+#include <filesystem>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include "HeadFile/Shader.h"
+#include "HeadFile/Mesh.h"
+#include "HeadFile/Camera.h"
+#include "HeadFile/TextureLoad.h"
+#include "HeadFile/MeshDraw/MeshSource.h"
+#include "HeadFile/MeshDraw/MeshObjectDraw.h"
+#include "HeadFile/ModelDraw_Object/InstanceSource.h"
+#include "HeadFile/ModelDraw_Object/ObjectDraw.h"
+#include "HeadFile/ModelDraw_Person/PersonDraw.h"
+
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
+
+
+int WindowWidth = 1200;//çª—å£å¤§å°
+int WindowHeight = 900;
+int WindowPos_X = 300;//çª—å£(å·¦ä¸Šè§’)ç”Ÿæˆä½ç½®
+int WindowPos_Y = 100;
+float aspectRatio = (float)(WindowWidth / WindowHeight);//çª—å£é•¿å®½æ¯”
+bool IsPaused = false;//æ˜¯å¦æš‚åœ
+bool LastSpacePressd = false;//æ£€æµ‹ä¸Šä¸€å¸§æ˜¯å¦æŒ‰ä¸‹space
+bool CurrentSpacePressd = false;//æ£€æµ‹å½“å‰å¸§æ˜¯å¦æŒ‰ä¸‹space
+bool IsKey_F = false;//æ˜¯å¦æŒ‰ä¸‹Fé”®
+bool LastKeyPressd_F = false;//æ£€æµ‹ä¸Šä¸€å¸§æ˜¯å¦æŒ‰ä¸‹Fé”®
+bool CurrentKeyPressd_F = false;//æ£€æµ‹å½“å‰å¸§æ˜¯å¦æŒ‰ä¸‹Fé”®
+bool IsKey_E = false;//æ˜¯å¦æŒ‰ä¸‹Eé”®
+bool LastKeyPressd_E = false;//æ£€æµ‹ä¸Šä¸€å¸§æ˜¯å¦æŒ‰ä¸‹Eé”®
+bool CurrentKeyPressd_E = false;//æ£€æµ‹å½“å‰å¸§æ˜¯å¦æŒ‰ä¸‹Eé”®
+bool IsKey_M = false;//æ˜¯å¦æŒ‰ä¸‹Mé”®
+bool LastKeyPressd_M = false;//æ£€æµ‹ä¸Šä¸€å¸§æ˜¯å¦æŒ‰ä¸‹Mé”®
+bool CurrentKeyPressd_M = false;//æ£€æµ‹å½“å‰å¸§æ˜¯å¦æŒ‰ä¸‹Mé”®
+bool IsAlt = false;//æ˜¯å¦æŒ‰ä¸‹Alt
+bool IsAltRealise = false;//æ˜¯å¦æ¾å¼€Alt
+float LastTime = 0.0f;//ä¸Šä¸€å¸§æ—¶é—´
+float CurrentTime = 0.0f;//å½“å‰å¸§æ—¶é—´
+float PassedTime = 0.0f;//éæš‚åœæ—¶ç»è¿‡çš„æ—¶é—´
+float PeriodTime = 0.0f;//æ¯ä¸¤å¸§ä¹‹é—´çš„æ—¶é—´
+int FPSCount = 0;//å¸§æ•°ç›®
+float OneSecond = 0.0f;//è®°å½•ä¸€ç§’é’Ÿ
+float LastX = 960;//é¼ æ ‡åˆå§‹ä½ç½®ï¼ˆæ¸²æŸ“çª—å£ä¸­å¿ƒï¼‰
+float LastY = 540;
+bool FirstMouse = true;//æ˜¯å¦é¦–æ¬¡è·å–é¼ æ ‡è¾“å…¥
+float rate = 0.0f;//çº¹ç†å¯è§åº¦
+
+//æ‘„åƒæœºè®¾ç½®
+Camera camera(glm::vec3(0.0f, 0.0f, 2.0f));
+glm::vec3 CameraPos;
+glm::vec3 CameraFront;
+glm::vec3 CameraUP;
+
+//å…‰ç…§è®¾ç½®
+//glm::vec3 LightColor(sin(glfwGetTime() * 1.0f)/2.0f+0.5f,sin(glfwGetTime() * 1.2f)/2.0f+0.5f,sin(glfwGetTime() * 1.5f)/2.0f+0.5f);
+//ç‚¹å…‰æº
+glm::vec3 PointLightColor;//ç‚¹å…‰æºé¢œè‰²
+glm::vec3 PointLightPos;//ç‚¹å…‰æºä½ç½®
+//å¹³è¡Œå…‰
+glm::vec3 DirectLightDirection;//å¹³è¡Œå…‰æ–¹å‘
+glm::vec3 DirectLightColor;//å¹³è¡Œå…‰é¢œè‰²
+//æ‰‹ç”µå…‰
+glm::vec3 FlashLightColor;//æ‰‹ç”µå…‰é¢œè‰²
+float InnerAngle;//æ‰‹ç”µå…‰å†…åœˆè§’åº¦ï¼ˆä½™å¼¦å€¼ï¼‰
+float OuterAngle;//æ‰‹ç”µå…‰å¤–åœˆè§’åº¦ï¼ˆä½™å¼¦å€¼ï¼‰
+
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void mouse_callback(GLFWwindow* window, double pos_x, double pos_y);
+void scroll_callback(GLFWwindow* window, double offset_x, double offset_y);
+void processInput(GLFWwindow* window);
+
+
+int main()
+{
+   glfwInit();
+   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);//å½“å‰OpenGLä¸Šä¸‹æ–‡ä½¿ç”¨æ ¸å¿ƒé…ç½®æ–‡ä»¶
+   //glfwWindowHint(GLFW_SAMPLES, 4);//å°†é‡‡æ ·ç‚¹çš„æ•°é‡è®¾ç½®ä¸º4ä¸ª(é¢œè‰²ç¼“å†²åŒºæ‰©å¤§4å€) ç¦»å±MASSä¸éœ€è¦æ­¤è¡Œ
+   //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);//å¼€å¯åç¦æ­¢ä½¿ç”¨æ—§OpenGLåŠŸèƒ½
+
+   //åˆ›å»ºä¸€ä¸ªçª—å£
+   GLFWwindow* window = glfwCreateWindow(WindowWidth, WindowHeight, "LearnOpenGL", NULL, NULL);
+   if (window == NULL)
+   {
+       std::cout << "Failed to create GLFW window" << std::endl;
+       glfwTerminate();
+       return -1;
+   }
+   glfwMakeContextCurrent(window);
+   glfwSetWindowPos(window, WindowPos_X, WindowPos_Y);//è®¾ç½®çª—å£ä½ç½®
+
+   //åˆå§‹åŒ–glad
+   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+   {
+       std::cout << "Failed to initialize GLAD" << std::endl;
+       return -1;
+   }
+
+   //è®¾ç½®è§†å£
+   glViewport(0, 0, WindowWidth, WindowHeight);
+
+   //è®¾ç½®æ¸²æŸ“æ¨¡å¼
+   //glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);//çº¿æ¡†æ¨¡å¼
+   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);//å¡«å……æ¨¡å¼
+
+   //å¯ç”¨æ·±åº¦æµ‹è¯•ã€æ¨¡æ¿æµ‹è¯•ï¼ˆå…¨å±€çŠ¶æ€ï¼Œä¸ç®¡æ˜¯é»˜è®¤å¸§ç¼“å†²è¿˜æ˜¯è‡ªå»ºå¸§ç¼“å†²éƒ½ä¼šå¯ç”¨æµ‹è¯•ï¼‰
+   glEnable(GL_DEPTH_TEST);
+   glDepthFunc(GL_LESS);
+   glEnable(GL_STENCIL_TEST);
+   glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);//æ¨¡æ¿æ£€æµ‹å¤±è´¥æ—¶æ¨¡æ¿å€¼ä¸å˜ï¼Œæ¨¡æ¿æ£€æŸ¥é€šè¿‡ä½†æ·±åº¦æ£€æµ‹å¤±è´¥æ—¶æ¨¡æ¿å€¼æ›¿æ¢ä¸ºå‚è€ƒå€¼ï¼Œéƒ½é€šè¿‡æ—¶æ¨¡æ¿å€¼æ›¿æ¢ä¸ºå‚è€ƒå€¼
+
+   //å¯ç”¨é¢å‰”é™¤
+   //glEnable(GL_CULL_FACE);
+
+   //å¯ç”¨MASSå¤šé‡é‡‡æ ·æŠ€æœ¯(ä¸ä¸»åŠ¨å¯ç”¨ä¹Ÿæœ‰å¯èƒ½æ˜¯é»˜è®¤å°±å¯ç”¨äº†)
+   glEnable(GL_MULTISAMPLE);
+
+   //è°ƒç”¨çª—å£å¤§å°å›è°ƒå‡½æ•°
+   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);//æ¯å½“ç”¨æˆ·æ‰‹åŠ¨è°ƒæ•´çª—å£å¤§å°æ—¶å°±ä¼šè°ƒç”¨å›è°ƒå‡½æ•°(GLFWä¼šè‡ªåŠ¨æ£€æµ‹æ˜¯å¦éœ€è¦è°ƒç”¨å‡½æ•°ï¼Œæ‰€ä»¥ä¸ç”¨å†™åœ¨å¾ªç¯å†…éƒ¨)
+   //å³ä½¿æ²¡æœ‰è¿™ä¸ªå‡½æ•°GLFWä¹Ÿå…è®¸ç”¨æˆ·æ‰‹åŠ¨è°ƒèŠ‚çª—å£å¤§å°ï¼Œä½†ä¸ä¼šå¸®æˆ‘ä»¬è°ƒèŠ‚è§†å£å¤§å°å’Œå…¶ä»–ç›¸å…³é…ç½®
+
+   //é¼ æ ‡æ£€æµ‹
+   //glfwSetInputMode(window,GLFW_CURSOR,GLFW_CURSOR_DISABLED);
+   glfwSetCursorPosCallback(window, mouse_callback);//glfwè‡ªåŠ¨æ•è·é¼ æ ‡ä½ç½®å¹¶ä¼ é€’ç»™mouse_callback
+   glfwSetScrollCallback(window, scroll_callback);//æ•è·æ»šè½®ç§»åŠ¨å¢é‡å¹¶ä¼ é€’ç»™scroll_callback
+
+   //è®¾ç½®ç€è‰²å™¨
+   //Shader BoxShader("ShaderSource/vShader_Box.glsl", "ShaderSource/fShader_Box.glsl");
+   Shader WallShader("ShaderSource/vShader_Wall.glsl", "ShaderSource/fShader_Wall.glsl");
+   Shader LightBallShader("ShaderSource/vShader_Light.glsl", "ShaderSource/fShader_Light.glsl");
+   Shader GrassShader("ShaderSource/vShader_Grass.glsl", "ShaderSource/fShader_Grass.glsl");
+   Shader WindowShader("ShaderSource/vShader_Window.glsl", "ShaderSource/fShader_Window.glsl");
+   Shader ScreenShader("ShaderSource/vShader_Screen.glsl", "ShaderSource/fShader_Screen.glsl");
+   Shader SkyBoxShader("ShaderSource/vShader_SkyBox.glsl", "ShaderSource/fShader_SkyBox.glsl");
+   Shader ModelShader_Knight("ShaderSource/vShader_Model.glsl", "ShaderSource/fShader_Knight.glsl");
+   Shader ModelShader_KnightInstance("ShaderSource/vShader_KnightInstance.glsl", "ShaderSource/fShader_Knight.glsl");
+   Shader ModelShader_JinXi("ShaderSource/vShader_Model.glsl", "ShaderSource/fShader_PersonModel.glsl");
+   Shader FrameShader("ShaderSource/vShader_Frame.glsl", "ShaderSource/fShader_Frame.glsl");
+   Shader DiscoBallShader("ShaderSource/vShader_DiscoBall.glsl", "ShaderSource/fShader_DiscoBall.glsl");
+
+   //è®¾ç½®çº¹ç†
+   //unsigned int BoxTexture1 = LoadTexture((std::filesystem::current_path() / "source/Makima.jpg").string().c_str());//ç¡®ä¿c++17ä»¥ä¸Š
+   //unsigned int BoxTexture2 = LoadTexture((std::filesystem::current_path()   / "source/Makima3.jpg").string().c_str());
+   unsigned int WallTexture1 = LoadTexture((std::filesystem::current_path() / "source/Wall.png").string().c_str());
+   unsigned int WallTexture2 = LoadTexture((std::filesystem::current_path() / "source/Specular Map.png").string().c_str());
+   unsigned int WallTexture3 = LoadTexture((std::filesystem::current_path() / "source/Code.jpg").string().c_str());
+   unsigned int GrassTexture1 = LoadTexture((std::filesystem::current_path() / "source/grass.png").string().c_str());
+   unsigned int WindowTexture1 = LoadTexture((std::filesystem::current_path() / "source/window.png").string().c_str());
+
+   //è®¾ç½®ç«‹æ–¹ä½“è´´å›¾çº¹ç†
+   std::vector<std::string> SkyBoxFaces_Path = {
+       (std::filesystem::current_path() / "source/skybox/skybox/right.jpg").string().c_str(),
+       (std::filesystem::current_path() / "source/skybox/skybox/left.jpg").string().c_str(),
+       (std::filesystem::current_path() / "source/skybox/skybox/top.jpg").string().c_str(),
+       (std::filesystem::current_path() / "source/skybox/skybox/bottom.jpg").string().c_str(),
+       (std::filesystem::current_path() / "source/skybox/skybox/front.jpg").string().c_str(),
+       (std::filesystem::current_path() / "source/skybox/skybox/back.jpg").string().c_str()
+   };
+   unsigned int SkyBoxCMTexture = LoadCubeTexture(SkyBoxFaces_Path);
+
+
+   //ç½‘æ ¼çº¹ç†
+   std::vector<Texture> WallTextures =
+   {
+       {WallTexture1,"DiffuseColorSampler","source/Wall.png"},
+       {WallTexture2,"SpecularColorSampler","source/Specular Map.png"},
+       {WallTexture3,"EmissionColorSampler","source/Code.jpg"}
+   };
+   std::vector<Texture> GrassTextures = {
+       {GrassTexture1,"DiffuseColorSampler","source/grass.png"}
+   };
+   std::vector<Texture> WindowTextures = {
+       {WindowTexture1,"DiffuseColorSampler","source/window.png"}
+   };
+   std::vector<Texture> ScreenTextures = {};
+   std::vector<Texture> SkyBoxTextures = {};
+
+   //åŠ è½½ç½‘æ ¼
+   //Mesh BoxMesh(BoxVertices,BoxIndices,BoxTextures);
+   Mesh WallMesh(WallVertices, WallIndices, WallTextures);
+   Mesh GrassMesh(SquareVertices, SquareIndices, GrassTextures);
+   Mesh WindowMesh(SquareVertices, SquareIndices, WindowTextures);
+   Mesh ScreenMesh(ScreenVertices, SquareIndices, ScreenTextures);
+   Mesh SkyBoxMesh(CubeVertices, CubeIndices, SkyBoxTextures);
+
+   //åŠ è½½æ¨¡å‹
+   Model PersonModel_Knight((std::filesystem::current_path() / "source/nanosuit_reflection/nanosuit.obj").string());
+   Model PersonModel_JinXi((std::filesystem::current_path() / "source/JinXi/01.fbx").string());
+   Model LightBallModel((std::filesystem::current_path() / "source/Hollow Sphere/linked_star.obj").string());
+   Model DiscoBallModel((std::filesystem::current_path() / "source/Ball/DiscoBall.fbx").string());
+
+
+   //åˆ›å»ºå¤šé‡é‡‡æ ·å¸§ç¼“å†²
+   unsigned int MultiSampleFBO;
+   glGenFramebuffers(1, &MultiSampleFBO);//åˆ›å»ºå¤šé‡é‡‡æ ·å¸§ç¼“å†²
+   glBindFramebuffer(GL_FRAMEBUFFER, MultiSampleFBO);//ç»‘å®šMultiSampleFBO
+   //åˆ›å»ºå¤šé‡é‡‡æ ·é¢œè‰²çº¹ç†é™„ä»¶
+   unsigned int ColorTexAttachment;
+   glGenTextures(1, &ColorTexAttachment);//åˆ›å»ºé¢œè‰²çº¹ç†é™„ä»¶
+   glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, ColorTexAttachment);//ç»‘å®š
+   //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WindowWidth, WindowHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);//åˆ›å»ºçº¹ç†ä½†ä¸åˆå§‹åŒ–
+   glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGB, WindowWidth, WindowHeight, GL_TRUE);//åˆ›å»ºæ”¯æŒå¤šé‡‡æ ·ç‚¹çº¹ç†ä¸”ä¸åˆå§‹åŒ–
+   glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);//ç¯ç»•æ–¹å¼
+   glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+   glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR);//è¿‡æ»¤æ–¹å¼
+   glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, ColorTexAttachment, 0);//æŠŠé¢œè‰²çº¹ç†é™„ä»¶é™„åŠ åˆ°å½“å‰ç»‘å®šçš„MultiSampleFBOä¸Š
+   //åˆ›å»ºå¤šé‡é‡‡æ ·æ¸²æŸ“ç¼“å†²å¯¹è±¡(æ·±åº¦æ¨¡æ¿é™„ä»¶)
+   unsigned int RBO;
+   glGenRenderbuffers(1, &RBO);//åˆ›å»ºæ¸²æŸ“ç¼“å†²
+   glBindRenderbuffer(GL_RENDERBUFFER, RBO);//ç»‘å®š
+   //glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, WindowWidth, WindowHeight);//ä¸ºæ¸²æŸ“ç¼“å†²å¯¹è±¡åˆ†é…å­˜å‚¨ç©ºé—´(æ·±åº¦ç¼“å†²åŒº24ä½ï¼Œæ¨¡æ¿ç¼“å†²åŒº8ä½)
+   glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, WindowWidth, WindowHeight);//ä¸ºå¤šé‡é‡‡æ ·æ¸²æŸ“ç¼“å†²å¯¹è±¡åˆ†é…å­˜å‚¨ç©ºé—´(æ·±åº¦ç¼“å†²åŒº24ä½ï¼Œæ¨¡æ¿ç¼“å†²åŒº8ä½)
+   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, RBO);//æŠŠæ·±åº¦æ¨¡æ¿é™„ä»¶é™„åŠ åˆ°å½“å‰ç»‘å®šçš„MultiSampleFBOä¸Š
+   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)//æ£€æµ‹MultiSampleFBOæ˜¯å¦å®Œæ•´
+   {
+       std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+   }
+   glBindFramebuffer(GL_FRAMEBUFFER, 0);//è§£ç»‘MultiSampleFBO
+
+
+   //åˆ›å»ºåå¤„ç†å¸§ç¼“å†²
+   unsigned int IntermediateFBO;
+   glGenFramebuffers(1, &IntermediateFBO);
+   glBindFramebuffer(GL_FRAMEBUFFER, IntermediateFBO);
+   //åˆ›å»ºæ™®é€šé¢œè‰²çº¹ç†é™„ä»¶
+   unsigned int ScreenTexture;
+   glGenTextures(1, &ScreenTexture);
+   glBindTexture(GL_TEXTURE_2D, ScreenTexture);
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WindowWidth, WindowHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+   //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);//ç¯ç»•æ–¹å¼
+   //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);//è¿‡æ»¤æ–¹å¼
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ScreenTexture, 0);
+
+   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)//æ£€æµ‹IntermediateFBOæ˜¯å¦å®Œæ•´
+   {
+       std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+   }
+   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+   //IntermediateFBOå­˜å‚¨åªå·®åå¤„ç†çš„ç”»é¢ï¼Œå› æ­¤ä¸éœ€è¦é¢å¤–çš„æ·±åº¦æ¨¡æ¿é™„ä»¶
+
+
+   //ModelDraw_Person
+   PersonModelDraw Knight(ModelShader_Knight, PersonModel_Knight, &FrameShader);
+   PersonModelDraw KnightInstance(ModelShader_KnightInstance, PersonModel_Knight);
+   PersonModelDraw JinXi(ModelShader_JinXi, PersonModel_JinXi, &FrameShader);
+   ObjectModelDrawWL DiscoBall(DiscoBallShader, DiscoBallModel, &FrameShader);
+   ObjectModelDrawNL LightBall(LightBallShader, LightBallModel, &FrameShader);
+
+   //MeshDraw
+   ObjectMeshDrawWL Wall(WallShader, WallMesh);
+   ObjectMeshDrawNL Grass(GrassShader, GrassMesh);
+   ObjectMeshDrawNL Window(WindowShader, WindowMesh);
+   ObjectMeshDrawNL SkyBox(SkyBoxShader, SkyBoxMesh);
+
+   //å®ä¾‹åŒ–è®¾ç½®
+   InstancedArray_Knight(PersonModel_Knight, 8);//ç”±äºæˆ‘ä»¬çš„å®ä¾‹åŒ–æ•°ç»„aInstenceModelMatrixæ˜¯åœ¨æ¸²æŸ“å¾ªç¯å¤–ä¼ é€’ç»™GPUçš„ï¼Œæ‰€ä»¥è‹¥æƒ³ä½¿ç”¨ä¸æ—¶é—´æœ‰å…³çš„å˜åŒ–é‡åˆ™éœ€è¦é¢å¤–ä½¿ç”¨uniformä¼ é€’
+
+   //æ¸²æŸ“å¾ªç¯
+   while (!glfwWindowShouldClose(window))
+   {
+       //æ•è·å¤„ç†è¾“å…¥äº‹ä»¶
+       glfwPollEvents();//è§¦å‘å›è°ƒå‡½æ•°
+
+       //æ£€æŸ¥å…·ä½“è¾“å…¥çŠ¶æ€
+       processInput(window);
+
+       //è·å–æ¯å¸§æ—¶é—´
+       CurrentTime = (float)glfwGetTime();
+       PeriodTime = CurrentTime - LastTime;
+       if (!IsPaused)
+       {
+           PassedTime += CurrentTime - LastTime;
+       }
+       LastTime = CurrentTime;
+
+       //è®¡ç®—å¸§ç‡
+       FPSCount++;
+       OneSecond += PeriodTime;
+       if (OneSecond >= 1.0f)
+       {
+           float FPS = (float)FPSCount / OneSecond;
+           std::string Title = "FPS:  " + std::to_string(FPS);
+           glfwSetWindowTitle(window, Title.c_str());
+           OneSecond = 0.0f;
+           FPSCount = 0;
+       }
+
+       //å¯ç”¨å¸§ç¼“å†²
+       glBindFramebuffer(GL_FRAMEBUFFER, MultiSampleFBO);
+
+       //å…¨å±€çŠ¶æ€é‡è®¾ç½®
+           /*è®¾ç½®çª—å£èƒŒæ™¯é¢œè‰²å¹¶åœ¨æ¯æ¬¡å¾ªç¯åé‡æ–°æ¸²æŸ“(æ¸…é™¤é¢œè‰²ç¼“å†²å’Œæ·±åº¦ç¼“å†²)*/
+       glClearColor(0.678f, 0.847f, 0.902f, 1.0f);
+       glStencilMask(0xFF);//ç¡®ä¿æ¨¡æ¿ç¼“å†²åŒºèƒ½æ­£å¸¸æ¸…ç©º
+       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+       //æ‘„åƒæœºè®¾ç½®
+       CameraPos = camera.Pos;
+       CameraFront = camera.Front;
+       CameraUP = camera.Up;
+
+       //å…‰ç…§è®¾ç½®
+       /*ç‚¹å…‰æº*/
+       //PointLightColor(sin(glfwGetTime() * 1.0f)/2.0f+0.5f,sin(glfwGetTime() * 1.2f)/2.0f+0.5f,sin(glfwGetTime() * 1.5f)/2.0f+0.5f);
+       PointLightColor = glm::vec3(1.0f);//ç‚¹å…‰æºé¢œè‰²
+       PointLightPos = glm::vec3(0.9f * sin(PassedTime), 0.9f * cos(PassedTime) + 0.5f, sin(PassedTime) + 2.0f);//ç‚¹å…‰æºä½ç½®
+       /*å¹³è¡Œå…‰*/
+       DirectLightDirection = glm::vec3(1.0f, -1.0f, -1.0f);//å¹³è¡Œå…‰æ–¹å‘
+       DirectLightColor = glm::vec3(1.0f);//å¹³è¡Œå…‰é¢œè‰²
+       /*æ‰‹ç”µå…‰*/
+       FlashLightColor = glm::vec3(0.0f);//æ‰‹ç”µå…‰é¢œè‰²
+       InnerAngle = glm::cos(glm::radians(5.0f - rate));//æ‰‹ç”µå…‰å†…åœˆè§’åº¦ï¼ˆä½™å¼¦å€¼ï¼‰
+       OuterAngle = glm::cos(glm::radians(10.0f + rate));//æ‰‹ç”µå…‰å¤–åœˆè§’åº¦ï¼ˆä½™å¼¦å€¼ï¼‰
+
+       //å˜æ¢çŸ©é˜µ
+           /*ViewMatrix*/
+       glm::mat4 view = glm::mat4(1.0f);
+       view = camera.GetViewMatrix();
+       /*PorjectMatrix*/
+       glm::mat4 projection = glm::mat4(1.0f);
+       projection = glm::perspective(glm::radians(camera.Fov), aspectRatio, 0.1f, 100.0f);//è§†é‡å˜å°æ—¶ï¼Œç‰©ä½“å°†å æ®æ‘„åƒæœºï¼ˆå±å¹•ï¼‰æ›´å¤šä½ç½®ï¼Œçœ‹èµ·æ¥å˜å¾—æ›´å¤§
+
+
+       //äººç‰©æ¨¡å‹ç»˜åˆ¶
+           /*æ­¦å£«æ¨¡å‹ç»˜åˆ¶*/
+       glActiveTexture(GL_TEXTURE2);
+       glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxCMTexture);
+       //å˜æ¢çŸ©é˜µ
+       glm::mat4 model_Knight = glm::mat4(1.0f);
+       model_Knight = glm::translate(model_Knight, glm::vec3(0.5f, -1.0f, 1.0f));
+       model_Knight = glm::scale(model_Knight, glm::vec3(0.1f));
+       //æ¨¡æ¿æµ‹è¯•
+       glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+       glStencilFunc(GL_ALWAYS, 0b00000001, 0xFF);//æ¨¡æ¿æ£€æµ‹æ€»æ˜¯é€šè¿‡ï¼Œä¸”æ·±åº¦æ£€æµ‹ä¹Ÿèƒ½é€šè¿‡ï¼Œæ ¹æ®glStencilOpç¬¬ä¸‰ä¸ªå‚æ•°ï¼Œè¯¥å›¾å½¢çš„æ¨¡æ¿å€¼å°†è¢«æ›¿æ¢ä¸º00000001
+       glStencilMask(0b00000001);//å°†è¯¥ç‰©ä½“æ‰€å¯¹åº”çš„ç¼“å†²åŒºæ¨¡æ¿å€¼æ›´æ–°ä¸º00000001ï¼›æ­¤æ—¶æ•´ä¸ªæ¨¡æ¿ç¼“å†²åŒºä¸­ï¼šè¯¥ç‰©ä½“æ‰€å¯¹åº”ä½ç½®çš„æ¨¡æ¿å€¼ä¸º00000001ã€å…¶ä½™ä½ç½®ä¸º0
+       //ç»˜åˆ¶
+       Knight.GetMatrix(model_Knight, view, projection);
+       Knight.BasicShaderSet();
+       Knight.KinghtDraw();
+
+
+       /*ä»Šæ±æ¨¡å‹ç»˜åˆ¶*/
+       //å˜æ¢çŸ©é˜µ
+       glm::mat4 model_JinXi = glm::mat4(1.0f);
+       model_JinXi = glm::translate(model_JinXi, glm::vec3(-0.5f, -1.0f, 1.0f));
+       model_JinXi = glm::scale(model_JinXi, glm::vec3(0.08f));
+       //æ¨¡æ¿æµ‹è¯•
+       glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+       glStencilFunc(GL_ALWAYS, 0b00000010, 0xFF);
+       glStencilMask(0b00000010);//å°†è¯¥ç‰©ä½“æ‰€å¯¹åº”çš„ç¼“å†²åŒºæ¨¡æ¿å€¼æ›´æ–°ä¸º00000010//æ­¤æ—¶æ•´ä¸ªæ¨¡æ¿ç¼“å†²åŒºä¸­ï¼šè¯¥modelæ‰€å¯¹åº”ä½ç½®çš„æ¨¡æ¿å€¼ä¸º00000010ã€å¦ä¸€ä¸ªmodelæ‰€å¯¹åº”ä½ç½®ä¸º00000001ï¼Œè‹¥ä¸¤è€…æœ‰é‡å éƒ¨åˆ†ï¼Œåˆ™é‡å éƒ¨åˆ†ä¸º00000011
+       //ç»˜åˆ¶
+       JinXi.GetMatrix(model_JinXi, view, projection);
+       JinXi.BasicShaderSet();
+       JinXi.JinXiDraw();
+
+
+
+       //ç‰©ä½“æ¨¡å‹ç»˜åˆ¶
+           /*Discoçƒç»˜åˆ¶*/
+       glActiveTexture(GL_TEXTURE0);
+       glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxCMTexture);
+       //å˜æ¢çŸ©é˜µ
+       glm::mat4 model_DiscoBall = glm::mat4(1.0f);
+       model_DiscoBall = glm::translate(model_DiscoBall, glm::vec3(0.0f, 1.0f, 1.0f));
+       model_DiscoBall = glm::scale(model_DiscoBall, glm::vec3(0.005f, 0.005f, 0.005f));
+       model_DiscoBall = glm::rotate(model_DiscoBall, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+       model_DiscoBall = glm::rotate(model_DiscoBall, PassedTime * glm::radians(25.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+       //æ¨¡æ¿æµ‹è¯•
+       glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+       glStencilFunc(GL_ALWAYS, 1, 0xFF);//å…‰æºé€šè¿‡æ£€æµ‹ï¼Œä¸ä¸¢å¼ƒç‰‡æ®µ
+       glStencilMask(0x00);//ä¸æ›´æ–°è¯¥ç‰©ä½“æ‰€å¯¹åº”çš„æ¨¡æ¿ç¼“å†²åŒº//æ­¤æ—¶æ•´ä¸ªæ¨¡æ¿ç¼“å†²åŒºä¸­ï¼šåªæœ‰ä¸¤ä¸ªmodelæ‰€åœ¨ä½ç½®æœ‰éé›¶çš„æ¨¡æ¿å€¼ï¼Œå…¶ä½™éƒ¨åˆ†å‡ä¸º0
+       //ç»˜åˆ¶
+       DiscoBall.GetMatrix(model_DiscoBall, view, projection);
+       DiscoBall.BasicShaderSet();
+       DiscoBall.DiscoBallDraw();
+
+
+       /*å…‰æºç»˜åˆ¶*/
+       //å˜æ¢çŸ©é˜µ
+       glm::mat4 model_LightBall = glm::mat4(1.0f);
+       model_LightBall = glm::translate(model_LightBall, PointLightPos);
+       model_LightBall = glm::scale(model_LightBall, glm::vec3(0.002f, 0.002f, 0.002f));
+       //æ¨¡æ¿æµ‹è¯•
+       glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+       glStencilFunc(GL_ALWAYS, 1, 0xFF);//å…‰æºé€šè¿‡æ£€æµ‹ï¼Œä¸ä¸¢å¼ƒç‰‡æ®µ
+       glStencilMask(0x00);//ä¸æ›´æ–°è¯¥ç‰©ä½“æ‰€å¯¹åº”çš„æ¨¡æ¿ç¼“å†²åŒº//æ­¤æ—¶æ•´ä¸ªæ¨¡æ¿ç¼“å†²åŒºä¸­ï¼šåªæœ‰ä¸¤ä¸ªmodelæ‰€åœ¨ä½ç½®æœ‰éé›¶çš„æ¨¡æ¿å€¼ï¼Œå…¶ä½™éƒ¨åˆ†å‡ä¸º0
+       //ç»˜åˆ¶
+       LightBall.GetMatrix(model_LightBall, view, projection);
+       LightBall.BasicShaderSet();
+       LightBall.LightBallDraw();
+
+
+
+       //ç½‘æ ¼ç‰©ä½“ç»˜åˆ¶
+           /*å¢™ä½“ç»˜åˆ¶*/
+       glm::mat4 model_Wall = glm::mat4(1.0f);
+       model_Wall = glm::translate(model_Wall, glm::vec3(0.0f, -0.2f, 1.5f));
+       model_Wall = glm::scale(model_Wall, glm::vec3(1.5f));
+       //æ¨¡æ¿æµ‹è¯•
+       glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+       glStencilFunc(GL_ALWAYS, 1, 0xFF);//å¢™å£é€šè¿‡æ£€æµ‹ï¼Œä¸ä¸¢å¼ƒç‰‡æ®µ
+       glStencilMask(0x00);//ä¸æ›´æ–°è¯¥ç‰©ä½“æ‰€å¯¹åº”çš„æ¨¡æ¿ç¼“å†²åŒº//æ­¤æ—¶æ•´ä¸ªæ¨¡æ¿ç¼“å†²åŒºä¸­ï¼šåªæœ‰ä¸¤ä¸ªmodelæ‰€åœ¨ä½ç½®æœ‰éé›¶çš„æ¨¡æ¿å€¼ï¼Œå…¶ä½™éƒ¨åˆ†å‡ä¸º0
+       //ç»˜åˆ¶
+       Wall.GetMatrix(model_Wall, view, projection);
+       Wall.BasicShaderSet();
+       Wall.WallDraw();
+
+
+       /*ç¯å¢ƒç»˜åˆ¶*/
+       if (IsKey_E)
+       {
+           /*è‰åœ°*/
+           //å¯¹äºå…¨é€æ˜ç‰©ä½“(è‰çº¹ç†çš„è¾¹æ¡†)ï¼šä¸éœ€è¦æ··åˆæµ‹è¯•ï¼Œç›´æ¥ä¸¢å¼ƒç›¸åº”é€æ˜åº¦çš„ç‰‡æ®µå³å¯
+           glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+           glStencilFunc(GL_ALWAYS, 1, 0xFF);//é€šè¿‡æ£€æµ‹ï¼Œä¸ä¸¢å¼ƒç‰‡æ®µ
+           glStencilMask(0x00);//ä¸æ›´æ–°è¯¥ç‰©ä½“æ‰€å¯¹åº”çš„æ¨¡æ¿ç¼“å†²åŒº
+           std::vector<glm::vec3> vegetation;
+           vegetation.push_back(glm::vec3(-0.7f, -0.5f, 1.0f));
+           vegetation.push_back(glm::vec3(0.7f, -0.5f, 1.0f));
+           vegetation.push_back(glm::vec3(0.0f, -0.5f, 1.0f));
+
+           glm::mat4 model_Grass = glm::mat4(1.0f);
+
+           for (unsigned int i = 0; i < vegetation.size(); i++)
+           {
+               model_Grass = glm::mat4(1.0f);
+               model_Grass = glm::translate(model_Grass, vegetation[i]);
+               Grass.GetMatrix(model_Grass, view, projection);
+               Grass.BasicShaderSet();
+               Grass.GrassDraw();
+           }
+
+           /*çª—æˆ·*/
+           //å¯¹äºåŠé€æ˜ç‰©ä½“ï¼šä½¿ç”¨æ··åˆæµ‹è¯•ï¼Œç¡®ä¿å…ˆæ¸²æŸ“ä¸é€æ˜çš„ç‰©ä½“å†æ¸²æŸ“åŠé€æ˜çš„ç‰©ä½“ï¼Œå…ˆæ¸²æŸ“è¿œå¤„çš„åŠé€æ˜ç‰©ä½“å†æ¸²æŸ“è¿‘å¤„çš„åŠé€æ˜ç‰©ä½“
+           glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+           glStencilFunc(GL_ALWAYS, 1, 0xFF);//é€šè¿‡æ£€æµ‹ï¼Œä¸ä¸¢å¼ƒç‰‡æ®µ
+           glStencilMask(0x00);//ä¸æ›´æ–°è¯¥ç‰©ä½“æ‰€å¯¹åº”çš„æ¨¡æ¿ç¼“å†²åŒº
+           glEnable(GL_BLEND);//å¯ç”¨æ··åˆ
+           glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+           std::vector<glm::vec3> vegetation2;
+           vegetation2.push_back(glm::vec3(-0.35f, -0.5f, 1.0f));
+           vegetation2.push_back(glm::vec3(0.35f, -0.5f, 1.5f));
+           vegetation2.push_back(glm::vec3(0.0f, -0.5f, 2.0f));
+           std::map<float, glm::vec3> Sorted;
+           for (unsigned int i = 0; i < vegetation2.size(); i++)
+           {
+               float distence = glm::length(CameraPos - vegetation2[i]);
+               Sorted[distence] = vegetation2[i];
+           }
+           glm::mat4 model_Window = glm::mat4(1.0f);
+
+           for (auto it = Sorted.rbegin(); it != Sorted.rend(); ++it)
+           {
+               model_Window = glm::mat4(1.0f);
+               model_Window = glm::translate(model_Window, it->second);
+               Window.GetMatrix(model_Window, view, projection);
+               Window.BasicShaderSet();
+               Window.GrassDraw();
+           }
+           glDisable(GL_BLEND);
+       }
+
+       /*å¤©ç©ºç›’*/
+       glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+       glStencilFunc(GL_ALWAYS, 1, 0xFF);//é€šè¿‡æ¨¡æ¿æ£€æµ‹
+       glStencilMask(0x00);//ä¸æ›´æ–°è¯¥ç‰©ä½“æ‰€å¯¹åº”çš„æ¨¡æ¿ç¼“å†²åŒº
+       glDepthFunc(GL_LEQUAL);//æ·±åº¦å€¼å°äºç­‰äºæ·±åº¦ç¼“å†²åŒºçš„ç‰‡æ®µè¢«ä¿ç•™(å·²ç»æ¸²æŸ“è¿‡å…¶ä»–ç‰©ä½“çš„ä½ç½®çš„å¤©ç©ºç›’ç‰‡æ®µè¢«ä¸¢å¼ƒï¼Œå°šæœªæ¸²æŸ“è¿‡å…¶ä»–ç‰©ä½“çš„ä½ç½®é€šè¿‡æ·±åº¦æ£€æµ‹ï¼Œç›¸åº”æ·±åº¦ç¼“å†²åŒºè¢«è®¾ä¸º1.0(ä½†è¿™äº›åœ°æ–¹æœ¬æ¥å°±æ˜¯1.0å› ä¸ºæ·±åº¦ç¼“å†²åŒºé»˜è®¤å€¼ä¸º1.0))
+       glActiveTexture(GL_TEXTURE0);
+       glBindTexture(GL_TEXTURE_CUBE_MAP, SkyBoxCMTexture);
+       SkyBox.GetMatrix(glm::mat4(1.0f), glm::mat4(glm::mat3(view)), projection);//å»é™¤viewçŸ©é˜µä¸­çš„å¹³ç§»éƒ¨åˆ†ï¼Œå³æ‘„åƒæœºå§‹ç»ˆå¤„äºåæ ‡åŸç‚¹(ç§»åŠ¨æ—¶ä¹Ÿæ˜¯)
+       SkyBox.BasicShaderSet();
+       SkyBox.GrassDraw();
+       glDepthFunc(GL_LESS);//é‡æ–°è®¾ç½®æ·±åº¦æ£€æµ‹å‡½æ•°ä¸ºLESSé€šè¿‡
+
+
+
+       //è¾¹æ¡†ç»˜åˆ¶
+       if (IsKey_F)
+       {
+           /*æ­¦å£«è¾¹æ¡†ç»˜åˆ¶*/
+           //å˜æ¢çŸ©é˜µ
+           glm::mat4 Fmodel_Knight = glm::mat4(1.0f);
+           Fmodel_Knight = glm::translate(Fmodel_Knight, glm::vec3(0.5f, -1.0f, 1.0f));
+           Fmodel_Knight = glm::scale(Fmodel_Knight, glm::vec3(0.1001f));//è½®å»“çš„ç¼©æ”¾å€æ•°éœ€è¦åªæ¯”æ¨¡å‹çš„ç¼©æ”¾å€æ•°å¤§ä¸€ç‚¹ç‚¹å³å¯
+           //æ¨¡æ¿æ£€æµ‹
+           glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+           glStencilFunc(GL_NOTEQUAL, 0b00000001, 0b00000001);//ä¸¤ä¸ªmodelå¯¹åº”ä½ç½®çš„æ¨¡æ¿å€¼åˆ†åˆ«ä¸º00000001ã€00000010ï¼Œé‡å éƒ¨åˆ†ä¸º00000011ï¼Œå‡¡æ˜¯ç¬¬ä¸€ä½ä¸ç­‰äº1çš„å‡è¢«ä¸¢å¼ƒï¼Œæ•…åªæœ‰è¯¥modelçš„è¾¹æ¡†éƒ¨åˆ†èƒ½é€šè¿‡æ£€æµ‹
+           glStencilMask(0x00);//ä¸æ›´æ–°è¯¥ç‰©ä½“æ‰€å¯¹åº”çš„æ¨¡æ¿ç¼“å†²åŒº//æ­¤æ—¶æ•´ä¸ªæ¨¡æ¿ç¼“å†²åŒºä¸­ï¼šåªæœ‰ä¸¤ä¸ªmodelæ‰€åœ¨ä½ç½®æœ‰éé›¶çš„æ¨¡æ¿å€¼ï¼Œå…¶ä½™éƒ¨åˆ†å‡ä¸º0
+           //æ·±åº¦æ£€æµ‹
+           glDisable(GL_DEPTH_TEST);//æš‚æ—¶ç¦ç”¨æ·±åº¦æ£€æµ‹ï¼Œä½¿è¾¹æ¡†æ°¸è¿œèƒ½é€šè¿‡æ·±åº¦æ£€æµ‹
+           //ç»˜åˆ¶
+           Knight.GetFMatrix(Fmodel_Knight);
+           Knight.BasicFShaderSet();
+           Knight.KnightFrameDraw();
+           //æ¢å¤æ·±åº¦æ£€æµ‹
+           glEnable(GL_DEPTH_TEST);
+
+
+           /*ä»Šå¤•è¾¹æ¡†ç»˜åˆ¶*/
+           //å˜æ¢çŸ©é˜µ
+           glm::mat4 Fmodel_JinXi = glm::mat4(1.0f);
+           Fmodel_JinXi = glm::translate(Fmodel_JinXi, glm::vec3(-0.5f, -1.0f, 1.0f));
+           Fmodel_JinXi = glm::scale(Fmodel_JinXi, glm::vec3(0.0801f));
+           //æ¨¡æ¿æ£€æµ‹
+           glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+           glStencilFunc(GL_NOTEQUAL, 0b00000010, 0b00000010);//ä¸¤ä¸ªmodelå¯¹åº”ä½ç½®çš„æ¨¡æ¿å€¼åˆ†åˆ«ä¸º00000001ã€00000010ï¼Œé‡å éƒ¨åˆ†ä¸º00000011ï¼Œå‡¡æ˜¯ç¬¬äºŒä½ä¸ç­‰äº1çš„å‡è¢«ä¸¢å¼ƒï¼Œæ•…åªæœ‰è¯¥modelçš„è¾¹æ¡†èƒ½é€šè¿‡æ£€æµ‹
+           glStencilMask(0x00);//ä¸æ›´æ–°è¯¥ç‰©ä½“æ‰€å¯¹åº”çš„æ¨¡æ¿ç¼“å†²åŒº//æ­¤æ—¶æ•´ä¸ªæ¨¡æ¿ç¼“å†²åŒºä¸­ï¼šåªæœ‰ä¸¤ä¸ªmodelæ‰€åœ¨ä½ç½®æœ‰éé›¶çš„æ¨¡æ¿å€¼ï¼Œå…¶ä½™éƒ¨åˆ†å‡ä¸º0
+           //æ·±åº¦æ£€æµ‹
+           glDisable(GL_DEPTH_TEST);//æš‚æ—¶ç¦ç”¨æ·±åº¦æ£€æµ‹ï¼Œä½¿è¾¹æ¡†æ°¸è¿œèƒ½é€šè¿‡æ·±åº¦æ£€æµ‹
+           //ç»˜åˆ¶
+           JinXi.GetFMatrix(Fmodel_JinXi);
+           JinXi.BasicFShaderSet();
+           JinXi.JinXiFrameDraw();
+           //æ¢å¤æ·±åº¦æ£€æµ‹
+           glEnable(GL_DEPTH_TEST);
+       }
+
+
+       //å±å¹•ç»˜åˆ¶
+       glBindFramebuffer(GL_READ_FRAMEBUFFER, MultiSampleFBO);//ä»MultiSampleFBOä¸­è¯»å–å¤šé‡‡æ ·å¸§ç¼“å†²
+       glBindFramebuffer(GL_DRAW_FRAMEBUFFER, IntermediateFBO);//è®¾ç½®ç›®çš„å¸§ç¼“å†²ä¸ºIntermediateFBO
+       glBlitFramebuffer(0, 0, WindowWidth, WindowHeight, 0, 0, WindowWidth, WindowHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST);//å°†æºå¸§ç¼“å†²ä¸­çš„å†…å®¹è§£æåˆ°ç›®çš„å¸§ç¼“å†²ä¸­(ä»¥æ­¤ä½¿ç”¨IntermediateFBOæ¥è¿›è¡Œåå¤„ç†)
+
+       glBindFramebuffer(GL_FRAMEBUFFER, 0);//è§£ç»‘MultiSampleFBOï¼Œæ¢å¤åˆ°é»˜è®¤å¸§ç¼“å†²
+       glStencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
+       glStencilFunc(GL_ALWAYS, 1, 0xFF);//é€šè¿‡æ£€æµ‹ï¼Œä¸ä¸¢å¼ƒç‰‡æ®µ
+       glStencilMask(0x00);//ä¸æ›´æ–°è¯¥ç‰©ä½“æ‰€å¯¹åº”çš„æ¨¡æ¿ç¼“å†²åŒº
+       glDisable(GL_DEPTH_TEST);//éœ€è¦æš‚æ—¶ç¦ç”¨æ·±åº¦æ£€æµ‹ï¼Œå› ä¸ºæˆ‘ä»¬å¸Œæœ›åªåŠå°†å¸¦æœ‰ScreenTextureçº¹ç†çš„ScreenMeshç»˜åˆ¶åˆ°å±å¹•ä¸Šï¼Œæ‰€ä»¥ä¸éœ€è¦æ·±åº¦æ£€æµ‹
+       glClearColor(1.0f, 1.0f, 1.0f, 1.0f);//æ²¡è¢«ScreenMeshæ¸²æŸ“çš„åœ°æ–¹å°†ä¼šæ˜¯ç™½è‰²çš„
+       glClear(GL_COLOR_BUFFER_BIT);
+
+       ScreenShader.Use();
+       glActiveTexture(GL_TEXTURE0);
+       glBindTexture(GL_TEXTURE_2D, ScreenTexture);//å°†ScreenTextureç»‘å®šåˆ°GL_TEXTURE0ä¸Š
+       float SharpenKernel[9] = {
+           -1,-1,-1,
+           -1, 9,-1,
+           -1,-1,-1
+       };//é”åŒ–å·ç§¯æ ¸
+       float BlurKernel[9] = {
+           1.0 / 16.0, 2.0 / 16.0, 1.0 / 16.0,
+           2.0 / 16.0, 4.0 / 16.0, 2.0 / 16.0,
+           1.0 / 16.0, 2.0 / 16.0, 1.0 / 16.0
+       };//æ¨¡ç³Šå·ç§¯æ ¸
+       float NoKernel[9] = {
+           0.0, 0.0, 0.0,
+           0.0, 1.0, 0.0,
+           0.0, 0.0, 0.0
+       };//ä¸ä½¿ç”¨ä»»ä½•æ ¸æ•ˆæœ
+
+       //ä¸»å±å¹•
+       glm::mat4 model_Screen = glm::mat4(1.0f);
+       ScreenShader.setMat4("model", model_Screen);
+       ScreenShader.SetBool("IfKernel", false);
+       ScreenShader.SetBool("IfGray", false);
+       ScreenShader.SetBool("IfInverse", false);
+       ScreenShader.SetInt("ScreenTexture", 0);
+       ScreenMesh.Draw(ScreenShader);
+
+       //å‰¯å±å¹•
+       if (IsKey_M)
+       {
+           glm::mat4 model_Screen1 = glm::mat4(1.0f);
+           model_Screen1 = glm::scale(model_Screen1, glm::vec3(0.25));
+           model_Screen1 = glm::translate(model_Screen1, glm::vec3(-2.95f, -3.0f, 0.0f));
+           ScreenShader.setMat4("model", model_Screen1);
+           ScreenShader.SetBool("IfKernel", true);
+           ScreenShader.SetBool("IfGray", false);
+           ScreenShader.SetBool("IfInverse", false);
+           ScreenShader.SetFloatArray("Kernel", SharpenKernel, 9);
+           ScreenShader.SetInt("ScreenTexture", 0);
+           ScreenMesh.Draw(ScreenShader);
+       }
+       glEnable(GL_DEPTH_TEST);//æ¢å¤æ·±åº¦æ£€æµ‹
+
+
+       //äº¤æ¢ç¼“å†²åŒº
+       glfwSwapBuffers(window);
+   }
+
+   //æ¸…ç†
+   glfwTerminate();
+   return 0;
+}
+
+
+//çª—å£å¤§å°å›è°ƒå‡½æ•°
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+   if (width == 0 || height == 0) return;//å½“æœ€å°åŒ–çª—å£çš„æ—¶å€™ï¼Œè‡ªåŠ¨é€€å‡ºï¼Œé˜²æ­¢aspectRatioå¾—åˆ°é”™è¯¯çš„ç»“æœ
+   glViewport(0, 0, width, height);
+
+   aspectRatio = static_cast<float>(width) / static_cast<float>(height);
+}
+
+//é¼ æ ‡å›è°ƒå‡½æ•°
+void mouse_callback(GLFWwindow* window, double pos_x, double pos_y)
+{
+   float sensitivity = 0.05f;//çµæ•åº¦
+
+   if (FirstMouse)
+   {
+       pos_x = (double)LastX;
+       pos_y = (double)LastY;
+       FirstMouse = false;
+   }
+
+   if (!glfwGetKey(window, GLFW_KEY_LEFT_ALT) && !glfwGetKey(window, GLFW_KEY_RIGHT_ALT))
+   {
+       float offset_x = ((float)pos_x - LastX);
+       float offset_y = (LastY - (float)pos_y);
+       LastX = (float)pos_x;
+       LastY = (float)pos_y;
+
+       //æŒ‰ä¸‹è¿‡å¹¶æ¾å¼€Alt
+       if (IsAlt && IsAltRealise)
+       {
+           //æŒ‰ä¸‹è¿‡Altå¹¶æ¾å¼€åå¯¹Yawã€Pitchè¿›è¡ŒRollBack
+           camera.IfRollBack = true;
+           IsAlt = false;
+           IsAltRealise = false;
+       }
+
+       camera.ProcessMouseMove(offset_x, offset_y);
+   }
+}
+
+//æ»šè½®å›è°ƒå‡½æ•°
+void scroll_callback(GLFWwindow* window, double offset_x, double offset_y)
+{
+   camera.ProcessMouseScroll((float)offset_x, (float)offset_y);
+}
+
+//è¾“å…¥å‡½æ•°
+void processInput(GLFWwindow* window)
+{
+   //æ£€æµ‹ESC
+   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+   {
+       glfwSetWindowShouldClose(window, GL_TRUE);
+   }
+
+   //æ£€æµ‹space
+   CurrentSpacePressd = (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
+   if (!LastSpacePressd && CurrentSpacePressd)
+   {
+       IsPaused = !IsPaused;
+   }
+   LastSpacePressd = CurrentSpacePressd;
+
+   //æ£€æµ‹Alt
+   if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS)
+   {
+       glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);//æ˜¾ç¤ºé¼ æ ‡å¹¶æ¢å¤æ´»åŠ¨èŒƒå›´
+       IsAlt = true;
+   }
+   else
+   {
+       glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);//éšè—é¼ æ ‡å¹¶å°†é¼ æ ‡çš„æ´»åŠ¨èŒƒå›´é™åˆ¶åœ¨çª—å£å†…
+       if (IsAlt)
+       {
+           IsAltRealise = true;//å½“æŒ‰ä¸‹è¿‡Altä¹‹åï¼Œæ¾å¼€æ‰æœ‰æ•ˆ(ä¿è¯Altæ¾å¼€ä¹‹åä»è¢«æŸå‡ å¸§æ£€æµ‹åˆ°çš„æ—¶å€™ï¼Œä¸ä¼šæ“…è‡ªæ¢å¤è§’åº¦)
+       }
+   }
+
+   //æ£€æµ‹AWSD
+   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+   {
+       camera.ProcessWASD(FORWARD, PeriodTime);
+   }
+   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+   {
+       camera.ProcessWASD(BACKWARD, PeriodTime);
+   }
+   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+   {
+       camera.ProcessWASD(LEFT, PeriodTime);
+   }
+   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+   {
+       camera.ProcessWASD(RIGHT, PeriodTime);
+   }
+
+   //æ£€æµ‹ä¸Šä¸‹æ–¹å‘é”®
+   float RateSpeed = 5.0f * PeriodTime;
+   if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+   {
+       if (rate < 4.0f)
+       {
+           rate += RateSpeed;
+       }
+   }
+   if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+   {
+       if (rate > -2.0f)
+       {
+           rate -= RateSpeed;
+       }
+   }
+
+   //æ£€æµ‹Fé”®
+   CurrentKeyPressd_F = (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS);
+   if (CurrentKeyPressd_F && !LastKeyPressd_F)
+   {
+       IsKey_F = !IsKey_F;
+   }
+   LastKeyPressd_F = CurrentKeyPressd_F;
+
+   //æ£€æµ‹Eé”®
+   CurrentKeyPressd_E = (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS);
+   if (CurrentKeyPressd_E && !LastKeyPressd_E)
+   {
+       IsKey_E = !IsKey_E;
+   }
+   LastKeyPressd_E = CurrentKeyPressd_E;
+
+   //æ£€æµ‹Mé”®
+   CurrentKeyPressd_M = (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS);
+   if (CurrentKeyPressd_M && !LastKeyPressd_M)
+   {
+       IsKey_M = !IsKey_M;
+   }
+   LastKeyPressd_M = CurrentKeyPressd_M;
+}
+
+
+
+//å›¾åƒç”Ÿæˆæµç¨‹
+//1.é¡¶ç‚¹ç€è‰²å™¨: é¡¶ç‚¹ç€è‰²å™¨å¤„ç†æ¯ä¸ªé¡¶ç‚¹ï¼Œå¹¶è¾“å‡ºå…¶ä½ç½®ä»¥åŠå…¶ä»–å¯èƒ½çš„å±æ€§ï¼ˆå¦‚é¢œè‰²ã€æ³•çº¿ç­‰ï¼‰ã€‚/**é¡¶ç‚¹ç€è‰²å™¨ä¸­åªæœ‰é¡¶ç‚¹æ•°ç»„ä¸­çš„ç‚¹ï¼ˆä¸€èˆ¬æ˜¯è¾¹ç•Œç‚¹ï¼‰
+//2.å›¾å…ƒç»„è£…:ä½¿ç”¨é¡¶ç‚¹ç€è‰²å™¨è¾“å‡ºçš„é¡¶ç‚¹ä¿¡æ¯ç»„è£…æˆä¸€ä¸ªä¸ªå›¾å…ƒ
+//3.å‡ ä½•ç€è‰²å™¨(å¦‚æœä½¿ç”¨çš„è¯):å¯¹ç»„è£…å¥½çš„å›¾å…ƒè¿›è¡Œä¿®æ”¹
+//4.å…‰æ …åŒ–:OpenGL ä¼šæ ¹æ®é¡¶ç‚¹çš„å±å¹•ç©ºé—´åæ ‡ç¡®å®šå›¾å…ƒçš„è¾¹ç•Œï¼Œå¹¶è®¡ç®—å‡ºæ‰€æœ‰ä½äºå›¾å…ƒå†…éƒ¨çš„ç‰‡æ®µï¼ˆå³åƒç´ ï¼‰çš„ä½ç½®ã€‚
+//5.ç‰‡æ®µç€è‰²å™¨:æ¯ä¸ªç”Ÿæˆçš„ç‰‡æ®µä¼šä¼ é€’ç»™ç‰‡æ®µç€è‰²å™¨(ä¸åŒºåˆ†å…·ä½“å›¾å…ƒï¼Œç›´æ¥å¤„ç†æ‰€æœ‰é€šè¿‡å…‰æ …åŒ–çš„ç‰‡æ®µ)ï¼Œè¿›è¡Œè¿›ä¸€æ­¥å¤„ç†ï¼Œå¦‚è®¡ç®—é¢œè‰²å’Œå…‰ç…§ç­‰ã€‚å±å¹•(æ¸²æŸ“ç”»é¢ä¸­)ä¸Šæœ‰å‡ ä¸ªåƒç´ ç‚¹å°±è¿è¡Œå‡ æ¬¡ç‰‡æ®µç€è‰²å™¨/**ç‰‡æ®µç€è‰²å™¨ä¸­æœ‰è¿™ä¸ªå›¾å½¢çš„æ‰€æœ‰åƒç´ ç‚¹
+//**ä»é¡¶ç‚¹ç€è‰²å™¨å‘ç‰‡æ®µç€è‰²å™¨ä¼ é€’çš„é‡éƒ½æ˜¯æ’å€¼åçš„é‡(vShader out FragColor(ä»…æœ‰é¡¶ç‚¹é¢œè‰²) -> fShader in FragColor(æœ‰æ¯ä¸ªåƒç´ ç‚¹çš„é¢œè‰²))
+//gl_Positonä¹Ÿä¼šæ’å€¼ååœ¨ç‰‡æ®µç€è‰²å™¨ä¸­è¢«ä½¿ç”¨ï¼Œä½†æˆ‘ä»¬ä¸éœ€è¦æ˜¾å¼åœ°æ¥æ”¶gl_Positon
+
+//é¡¶ç‚¹æ•°ç»„å¯¹è±¡ï¼ˆVAOï¼‰åœ¨OpenGLä¸­è´Ÿè´£å°†é¡¶ç‚¹ç¼“å†²åŒºå¯¹è±¡ï¼ˆVBOï¼‰ä¸­çš„æ•°æ®ä¼ é€’ç»™é¡¶ç‚¹ç€è‰²å™¨//
+//ä¸€ã€1.åˆ›å»ºä¸€ä¸ªç¼“å†²åŒºVBO      2.å‘Šè¯‰è¯¥ç¼“å†²åŒºå¦‚ä½•å­˜å‚¨æ•°æ®  3.å°†æ•°æ®ä¼ é€’ç»™VBOï¼Œ
+//äºŒã€1.åˆ›å»ºä¸€ä¸ªâ€œè§£é‡Šå™¨â€VAO  2.å°†è¯¥VAOè®¾ç½®ä¸ºå½“å‰VAO      3.è®¾ç½®VAOå¦‚ä½•è§£é‡Šæ•°æ®      4.å°†æ•°æ®ä¼ é€’ç»™ç€è‰²å™¨
+
+/*çº¹ç†*/
+//ä¸€ã€çº¹ç†ç¯ç»•æ–¹å¼ï¼šå¤„ç†çº¹ç†åæ ‡è¶Šç•Œçš„æƒ…å†µ
+//äºŒã€çº¹ç†è¿‡æ»¤ï¼šå†³å®šä¸åŒåƒç´ è‰²å—çš„å–æ ·æ–¹å¼ï¼ˆå–ä¸´è¿‘è‰²å—æˆ–å–æ’å€¼è‰²å—ï¼‰
+//ä¸‰ã€å¤šçº§æ¸è¿œçº¹ç†ï¼šå½“æ‘„åƒæœºç¦»ç‰©ä½“å¾ˆè¿œæ—¶ï¼Œå¾ˆéš¾è·å–é«˜åˆ†è¾¨ç‡çš„çº¹ç†ï¼Œäºæ˜¯é¢„å…ˆåˆ›å»ºä¸€ä¸ªMipmapï¼ˆç”±å¾ˆå¤šåˆ†è¾¨ç‡ä¸æ–­æŠ˜åŠçš„åŸçº¹ç†ç»„æˆï¼‰ï¼Œç„¶åå–ä¸´è¿‘åˆ†è¾¨ç‡æˆ–å–æ’å€¼åˆ†è¾¨ç‡
+
+/*åæ ‡å˜æ¢*/
+//å±€éƒ¨åæ ‡ç³» -> (æ¨¡å‹å˜æ¢) -> ä¸–ç•Œåæ ‡ç³» -> (è§†å›¾å˜æ¢) -> è§‚å¯Ÿåæ ‡ç³» -> (æŠ•å½±å˜æ¢) -> è£å‰ªåæ ‡ç³» -> (è£å‰ª+é€è§†é™¤æ³•) -> è§„èŒƒè®¾å¤‡åæ ‡ç³»(NDC) -> (è§†å£å˜æ¢) -> å±å¹•åæ ‡ç³» -> è¿›è¡Œæ·±åº¦æµ‹è¯•ç­‰æ¸²æŸ“è¿‡ç¨‹
+//ä¸–ç•Œç©ºé—´ä»¥ä¸€ä¸ªå›ºå®šç‚¹(0,0,0)ä¸ºåæ ‡ç³»åŸç‚¹ï¼Œè§†å›¾ç©ºé—´ä»¥æ‘„åƒæœºä½ç½®ä¸ºåæ ‡ç³»åŸç‚¹ï¼Œè¿™ä¸¤ä¸ªç©ºé—´éƒ½æ˜¯çº¿æ€§ç©ºé—´(é¡¶ç‚¹çš„ç›¸å¯¹ä½ç½®ä¸ä¼šæ”¹å˜)ï¼Œè£å‰ªç©ºé—´åæ ‡åŸç‚¹ä¸è§†é”¥ä½“è¿‘å¹³é¢é‡åˆ(é€šå¸¸æ‘„åƒæœºä¸è¿‘å¹³é¢å¾ˆæ¥è¿‘)ï¼Œæ˜¯éçº¿æ€§ç©ºé—´
+//æŠ•å½±çŸ©é˜µå°†é¡¶ç‚¹ä»è§†å›¾ç©ºé—´å˜æ¢åˆ°è£å‰ªç©ºé—´(è¿™ä¸€æ­¥å«è§†å›¾å˜æ¢),è§†å›¾å˜æ¢å°†é¡¶ç‚¹æ·±åº¦å€¼(zåæ ‡å€¼)è¿›è¡Œéçº¿æ€§ç¼©æ”¾(æ¨¡æ‹Ÿè¿‘å¤§è¿œå°çš„æ•ˆæœ:éšç€ç‰©ä½“ä¸æ‘„åƒæœºçš„è·ç¦»å¢åŠ ï¼Œç‰©ä½“çš„åæ ‡å€¼ä¼šä»¥éçº¿æ€§çš„æ–¹å¼ç¼©å°)ï¼Œæ•…è£å‰ªç©ºé—´æ˜¯ä¸€ä¸ªéçº¿æ€§ç©ºé—´(åŸæœ¬é¡¶ç‚¹çš„ç›¸å¯¹ä½ç½®å‘ç”Ÿäº†å˜åŒ–)
+//å˜æ¢åˆ°è£å‰ªç©ºé—´ä¹‹åä¼šç”±OpenGLè‡ªåŠ¨å®Œæˆè£å‰ªå’Œé€è§†é™¤æ³•(ä¾é é½æ¬¡åæ ‡w)ï¼Œå°†é¡¶ç‚¹å˜æ¢åˆ°NDCä¸­ï¼Œæ­¤æ—¶x/y/zçš„å€¼éƒ½åœ¨(-1,1)ä¹‹é—´
+
+/*é½æ¬¡åæ ‡åˆ†é‡w*/
+// åœ¨è£å‰ªç©ºé—´ä¸­wç”±æ‘„åƒæœºä½ç½®ã€è¿‘è¿œè£å‰ªé¢ç­‰è®¡ç®—å¾—å‡º
+//1.é€è§†é™¤æ³•ï¼šåœ¨å°†è£å‰ªç©ºé—´çš„åæ ‡è½¬æ¢ä¸ºæ ‡å‡†åŒ–è®¾å¤‡åæ ‡ï¼ˆNDCï¼‰æ—¶ï¼Œxã€y å’Œ z ä¼šåˆ†åˆ«é™¤ä»¥ wã€‚è¿™ä¸€æ­¥éª¤ç¡®ä¿äº†é€è§†æ•ˆæœçš„æ­£ç¡®æ€§ã€‚
+//2.æ·±åº¦åˆ¤æ–­ï¼šåœ¨æ·±åº¦æµ‹è¯•ä¸­ï¼Œz åæ ‡çš„å€¼ä¼šä¸ w ç»“åˆä½¿ç”¨ï¼Œå¸®åŠ©ç¡®å®šå“ªä¸ªç‰‡å…ƒæ˜¯å¯è§çš„ã€‚é€šè¿‡æ·±åº¦ç¼“å†²åŒºå­˜å‚¨å½’ä¸€åŒ–åçš„æ·±åº¦å€¼ï¼Œç¡®ä¿åœºæ™¯ä¸­çš„ç‰©ä½“æŒ‰ç…§è·ç¦»æ­£ç¡®æ¸²æŸ“ã€‚
+//3.è£å‰ªï¼šåœ¨è£å‰ªè¿‡ç¨‹ä¸­ï¼Œw ç”¨äºåˆ¤æ–­é¡¶ç‚¹æ˜¯å¦åœ¨è£å‰ªç©ºé—´çš„æœ‰æ•ˆèŒƒå›´å†…ï¼ˆå³ - w åˆ° wï¼‰ã€‚å¦‚æœæŸä¸ªé¡¶ç‚¹çš„ x / wã€y / w æˆ– z / w è¶…å‡ºè¿™ä¸ªèŒƒå›´ï¼Œåˆ™è¯¥é¡¶ç‚¹ä¼šè¢«è£å‰ªæ‰ã€‚
+
+/*çª—å£ã€è§†å£ä¸ç”»é¢*/
+//1.çª—å£ç›¸å½“äºç›¸æ¡†ï¼Œè§†å£ç›¸å½“äºç›¸æ¡†ä¸­çš„ç”»çº¸ï¼Œæ¸²æŸ“çš„å›¾å½¢å°±æ˜¯ç”»çº¸ä¸Šçš„å†…å®¹ 
+//2.é€è§†çŸ©é˜µä¸­çš„å®½é«˜æ¯”å°±æ˜¯ç”»çº¸ä¸Šå†…å®¹çš„å®½é«˜æ¯”ï¼Œæƒ³è®©çª—å£å¤§å°è°ƒæ•´æ—¶ç”»é¢æ¯”ä¾‹ä¸å˜ï¼Œå°±è¦åœ¨æ”¹å˜çª—å£å¤§å°çš„æ”¹å˜é€è§†çŸ©é˜µå®½é«˜æ¯”
+//å¦‚æœé¡¶ç‚¹æ•°ç»„ä¸­çš„å³ä¸Šè§’çš„aPosåŒ¹é…çš„çº¹ç†åæ ‡æ˜¯(1,1),ä»£è¡¨çº¹ç†å›¾ç‰‡çš„å³ä¸Šè§’çš„åƒç´ å°†ä¼šä¸å³ä¸Šè§’aPosä½ç½®çš„åƒç´ é‡åˆï¼›å¦‚æœçº¹ç†åæ ‡æ˜¯(0.5,0.5)ï¼Œåˆ™å³ä¸Šè§’aPosä½ç½®çš„åƒç´ ä¼šæ˜¯çº¹ç†å›¾ç‰‡çš„ä¸­å¿ƒç‚¹åƒç´  
+
+/*ä½¿ç”¨ä¸åŒçš„VAOã€ç€è‰²å™¨ç»˜åˆ¶ä¸åŒå›¾å½¢*/
+//ä¸€ã€å¦‚æœæƒ³ä½¿ç”¨ä¸åŒçš„é¡¶ç‚¹æ•°ç»„ç»˜åˆ¶ä¸åŒçš„å›¾å½¢ï¼Œåˆ™éœ€è¦è®¾ç½®ä¸åŒçš„VAO
+//äºŒã€å¦‚æœæƒ³ä½¿ç”¨ä¸åŒçš„æ¸²æŸ“æ–¹å¼ç»˜åˆ¶ä¸åŒçš„å›¾å½¢ï¼Œåˆ™éœ€è¦è®¾ç½®ä¸åŒçš„ç€è‰²å™¨ç¨‹åºï¼ˆä¸»ä½“éƒ½æ˜¯Shader.h,ä½†å…·ä½“çš„é¡¶ç‚¹ç€è‰²å™¨å’Œç‰‡æ®µç€è‰²å™¨æœ‰æ‰€ä¸åŒï¼‰
+//ä¸‰ã€åˆ›é€ çš„ä¸¤ä¸ªç€è‰²å™¨ä¹‹é—´äº’ç›¸ç‹¬ç«‹ï¼Œç€è‰²å™¨ç¨‹åºä¸­çš„å˜é‡å€¼äº’ä¸ç»§æ‰¿ï¼Œå¦‚æœæ²¡æœ‰è®¾ç½®æŸä¸ªç€è‰²å™¨ç¨‹åºä¸­çš„å˜é‡ï¼Œåˆ™è¿™ä¸ªå˜é‡ä¸ºé»˜è®¤å€¼0ï¼ˆå¤§æ¦‚ç‡ï¼‰
+//å››ã€ç»˜åˆ¶ç¬¬äºŒä¸ªå›¾å½¢æ—¶ï¼Œéœ€è¦ç¬¬äºŒä¸ªä¸åŒçš„æ¨¡å‹çŸ©é˜µmodel2å¹¶ç”¨ç¬¬äºŒä¸ªç€è‰²å™¨myshader2æ¥å°†å…¶ä¼ å…¥ç€è‰²å™¨ç¨‹åºï¼Œä½†è§†å›¾çŸ©é˜µå’Œé€è§†çŸ©é˜µä¸éœ€è¦é¢å¤–å®šä¹‰ï¼Œç›´æ¥ç”¨view1å’Œprojection1å³å¯ï¼Œç»‘å®šç¬¬äºŒä¸ªå›¾å½¢çš„VAO2è¿›è¡Œç»˜åˆ¶
+
+/*æ·±åº¦ç¼“å†²*/
+//1.æ·±åº¦æµ‹è¯•åœ¨ç‰‡æ®µç€è‰²å™¨ä¹‹åã€æœ€ç»ˆé¢œè‰²å†™å…¥é¢œè‰²ç¼“å†²ä¹‹å‰è¿›è¡Œ
+//2.æ·±åº¦æµ‹è¯•å°†å½“å‰ç‰‡æ®µçš„æ·±åº¦å€¼è·Ÿæ·±åº¦ç¼“å†²ä¸­çš„æ·±åº¦å€¼è¿›è¡Œæ¯”è¾ƒï¼Œé€šè¿‡æ·±åº¦æµ‹è¯•çš„ç‰‡æ®µæ·±åº¦å€¼è¢«æ›´æ–°åˆ°æ·±åº¦ç¼“å†²åŒºä¸­ 
+//3.æœ€ç»ˆä¸å†æ·±åº¦ç¼“å†²åŒºä¸­çš„ç‰‡æ®µä¸ä¼šè¢«æ¸²æŸ“ï¼ˆå³è¢«é®æŒ¡ï¼‰ï¼Œä½†æˆ‘ä»¬ä»è®¡ç®—äº†å…¶ç‰‡æ®µçš„å…¨éƒ¨æ•°æ®ï¼ˆå¯ç”¨â€œæå‰æ·±åº¦æµ‹è¯•â€ä¼˜åŒ–ï¼‰
+//4.æ·±åº¦å€¼ç²¾åº¦ï¼šå°†è§‚å¯Ÿç©ºé—´ä¸­çš„zå€¼ï¼ˆä»‹äºè§†é”¥ä½“è¿‘å¹³é¢å’Œè¿œå¹³é¢ä¸­é—´çš„æŸä¸ªå€¼ï¼‰å˜æ¢åˆ°æ·±åº¦ç¼“å†²åŒºä¸­ï¼ˆå˜æ¢åˆ°0.0è‡³1.0ä¹‹é—´ï¼‰ï¼Œå¸¸ä½¿ç”¨éçº¿æ€§æ–¹ç¨‹ï¼ˆç¦»å±å¹•è¿‘çš„ç”»é¢zç²¾åº¦æ›´é«˜ï¼Œæ›´æ˜“äºåŒºåˆ†å‰åå…³ç³»ï¼‰
+
+/*é¢œè‰²ç¼“å†²ã€æ·±åº¦æµ‹è¯•ã€æ¨¡æ¿æµ‹è¯•*/
+//1.é¢œè‰²ç¼“å†²å’Œæ·±åº¦æµ‹è¯•çš„æ›´æ–°é€šå¸¸æ˜¯åœ¨æ‰€æœ‰ç‰‡æ®µæ¸²æŸ“å®Œæˆä¹‹åç»Ÿä¸€è¿›è¡Œçš„ï¼Œä¸¤ç§æµ‹è¯•å¹³è¡Œè¿›è¡Œï¼Œåªæœ‰ä¸¤ç§æµ‹è¯•éƒ½é€šè¿‡çš„ç‰‡æ®µæ‰ä¼šè¢«æ”¾å…¥é¢œè‰²ç¼“å†²åŒºä¸­
+//2.æ¨¡æ¿æµ‹è¯•åˆ™æ˜¯åœ¨æ¯ä¸€ä¸ªç‰©ä½“æ¸²æŸ“åï¼ˆå¾—åˆ°ç‰‡æ®µåï¼‰è¿›è¡Œçš„ã€‚å³æ¸²æŸ“ä¸€ä¸ªç‰©ä½“å°±è¿›è¡Œä¸€æ¬¡æ¨¡æ¿æµ‹è¯•ã€‚æ‰€æœ‰æ¸²æŸ“çš„ç‰©ä½“å…¬ç”¨ä¸€ä¸ªæ¨¡æ¿ç¼“å†²åŒº
+//3.æ¨¡æ¿ç¼“å†²åŒºå’Œå±å¹•ç›¸å¯¹åº”ï¼Œå±å¹•ä¸Šæ¯ä¸€ä¸ªåƒç´ ç‚¹éƒ½åœ¨æ¨¡æ¿ç¼“å†²åŒºä¸­å­˜æœ‰ä¸€ä¸ª8ä½çš„æ¨¡æ¿å€¼ã€‚
+//5.è‹¥ç‰©ä½“åœ¨å±å¹•çš„å·¦ä¸‹è§’ç»˜åˆ¶ï¼Œåˆ™ç‰©ä½“çš„æ¨¡æ¿å€¼ä¹Ÿåœ¨æ¨¡æ¿ç¼“å†²åŒº(å¯¹åº”çš„å±å¹•åƒç´ ä½ç½®)çš„å·¦ä¸‹è§’ã€‚æ¨¡æ¿æ£€æµ‹æ—¶ä¹Ÿåªæ£€æµ‹ç‰©ä½“åœ¨ç¼“å†²åŒºä¸­å¯¹åº”çš„æ¨¡æ¿å€¼ã€‚
+//6.æ¨¡æ¿ç¼“å†²åŒºä¸­çš„æ¨¡æ¿å€¼é»˜è®¤ä¸º0
+//7.æ¨¡æ¿ç¼“å†²åŒºæ¸…é›¶glClear(GL_STENCIL_BUFFER_BIT)ä¼šå—åˆ°æ¨¡æ¿æ©ç çš„å½±å“ï¼Œå¦‚æœå·²ç»è®¾ç½®äº†glStencilMask(0x00)ï¼Œåˆ™æ— æ³•æ¸…é›¶
+//8.æ¨¡æ¿æµ‹è¯•ï¼šå¯åŠ¨æ¨¡æ¿æµ‹è¯• -> è®¾ç½®æ¨¡æ¿å‡½æ•°(å†³å®šè¿›è¡Œæ¨¡æ¿æµ‹è¯•çš„æ¡ä»¶)ã€æ¨¡æ¿æ“ä½œ(å†³å®šå¦‚ä½•æ›´æ–°æ¨¡æ¿å€¼) -> è®¾ç½®æ¨¡æ¿æ©ç (å†³å®šæ¨¡æ¿å€¼çš„å“ªäº›ä½è¢«ä¿®æ”¹ï¼Œæ¨¡æ¿å‡½æ•°ä¸­æ©ç å†³å®šå“ªå‡ ä½è¢«æµ‹è¯•) -> æ¸²æŸ“ç‰©ä½“(æ­¤æ—¶æ¨¡æ¿ç¼“å†²åŒºä¼šæ ¹æ®æ¨¡æ¿æµ‹è¯•å’Œæ“ä½œæ›´æ–°)
+//9.æœ€å¥½åœ¨å…¶ä»–ç‰©ä½“æ¸²æŸ“å®Œä¹‹åå†æ¸²æŸ“è¾¹æ¡†ï¼Œè¿™æ ·æ‰èƒ½ä½¿è¾¹æ¡†ä¸ä¼šè¢«å…¶ä»–ç‰©ä½“(æ·±åº¦å€¼æ›´å°çš„)è¦†ç›–
+//10.è·Ÿæ·±åº¦æµ‹è¯•ã€æ¨¡æ¿æµ‹è¯•æœ‰å…³çš„æ“ä½œ(å¯ç”¨æ“ä½œã€Funcæ“ä½œã€æ©ç æ“ä½œã€OPæ“ä½œ)éƒ½æ˜¯å…¨å±€çš„ï¼Œå½“å‰ç»‘å®šå“ªä¸ªå¸§ç¼“å†²å®ƒå°±åœ¨å“ªä¸ªå¸§ç¼“å†²ä¸‹å·¥ä½œ
+//11.å…³äºglStencilOp()ï¼š
+//(*å‡è®¾æˆ‘ä»¬é€è¿‡é®æŒ¡ç‰©çœ‹æ¨¡å‹) 
+//(1).å½“å…ˆæ¸²æŸ“æ¨¡å‹åæ¸²æŸ“é®æŒ¡ç‰©æ—¶ï¼Œæ­¤æ—¶æ¨¡å‹çš„æ¨¡æ¿æ£€æµ‹å’Œæ·±åº¦æ£€æµ‹å‡é€šè¿‡ï¼Œè°ƒç”¨çš„æ˜¯ç¬¬ä¸‰ä¸ªå‚æ•°ï¼Œæ•…ç¬¬ä¸‰ä¸ªå‚æ•°éœ€è¦è°ƒæ•´ä¸ºGL_REPLACEæ‰èƒ½å°†æ¨¡å‹å¯¹åº”ä½ç½®çš„æ¨¡æ¿å€¼è®¾ç½®ä¸º1
+//(2).å½“å…ˆæ¸²æŸ“é®æŒ¡ç‰©åæ¸²æŸ“æ¨¡å‹æ—¶ï¼Œæ­¤æ—¶æ¨¡å‹åªèƒ½é€šè¿‡æ¨¡æ¿æ£€æµ‹æ— æ³•é€šè¿‡æ·±åº¦æ£€æµ‹,è°ƒç”¨çš„æ˜¯ç¬¬äºŒä¸ªå‚æ•°ï¼Œæ•…ç¬¬äºŒä¸ªå‚æ•°éœ€è¦è°ƒæ•´ä¸ºGL_REPLACEæ‰èƒ½å°†æ¨¡å‹å¯¹åº”ä½ç½®çš„æ¨¡æ¿å€¼è®¾ç½®ä¸º1ã€‚å¦‚æœè®¾ç½®æˆGL_KEEPï¼Œåˆ™æ¨¡å‹å¯¹åº”ä½ç½®æ¨¡æ¿å€¼ä»ä¸º0                       
+//(3).è‹¥æƒ³ä¸è€ƒè™‘æ¨¡å‹å’Œé®æŒ¡ç‰©çš„æ¸²æŸ“é¡ºåºä¾ç„¶èƒ½è¾¾åˆ°æƒ³è¦çš„ç»“æœï¼Œåˆ™ç¬¬äºŒä¸ªå’Œç¬¬ä¸‰ä¸ªå‚æ•°å‡è®¾ç½®ä¸ºGL_REPLACE
+
+/*æ··åˆæµ‹è¯•*/
+//1.å¯¹äºå…¨é€æ˜ç‰©ä½“(è‰çº¹ç†çš„è¾¹æ¡†)ï¼šä¸éœ€è¦æ··åˆæµ‹è¯•ï¼Œç›´æ¥ä¸¢å¼ƒç›¸åº”é€æ˜åº¦çš„ç‰‡æ®µå³å¯
+//2.å¯¹äºåŠé€æ˜ç‰©ä½“ï¼šä½¿ç”¨æ··åˆæµ‹è¯•ï¼Œç¡®ä¿å…ˆæ¸²æŸ“ä¸é€æ˜çš„ç‰©ä½“å†æ¸²æŸ“åŠé€æ˜çš„ç‰©ä½“ï¼Œå…ˆæ¸²æŸ“è¿œå¤„çš„åŠé€æ˜ç‰©ä½“å†æ¸²æŸ“è¿‘å¤„çš„åŠé€æ˜ç‰©ä½“
+
+/*å¸§ç¼“å†²*/
+//é»˜è®¤å¸§ç¼“å†²ï¼šç”±çª—å£ç³»ç»Ÿæä¾›çš„å¸§ç¼“å†²ï¼Œä¸å±å¹•æ˜¾ç¤ºç›¸å…³è”ï¼Œæ˜¯æ¸²æŸ“ç‰©ä½“çš„æœ€åä¸€æ­¥
+//ç¦»å±å¸§ç¼“å†²ï¼šæ‰‹åŠ¨åˆ›å»ºG_Bufferï¼Œä¸ç›´æ¥äºå±å¹•æ˜¾ç¤ºå…³è”ï¼Œç”¨äºä¸­é—´æ¸²æŸ“è¿‡ç¨‹å®ç°å…¶ä»–æ¸²æŸ“æ•ˆæœ
+// ä¸€ã€å¯ä»¥ä½¿ç”¨é»˜è®¤å¸§ç¼“å†²å°†ç»“æœç›´æ¥æ¸²æŸ“åˆ°å±å¹•ä¸Š
+// äºŒã€æˆ–è€…ä½¿ç”¨ä½¿ç”¨ç¦»å±å¸§ç¼“å†²å°†ç»“æœ(å°±æ˜¯æœ¬æ¥å±å¹•ä¸Šä¼šå‡ºç°çš„å†…å®¹)å…ˆæ¸²æŸ“åˆ°è‡ªå»ºG_Bufferçš„é¢œè‰²çº¹ç†é™„ä»¶ä¸­(æ­¤æ—¶å°±ç›¸å½“äºæŠŠåŸæœ¬æ•´ä¸ªå±å¹•ä¸Šçš„å†…å®¹åšæˆä¸€å¼ è´´å›¾)ï¼Œ
+// å†å°†G_Bufferä¸­çš„å†…å®¹å¤„ç†ä¹‹åå†æ¸²æŸ“åˆ°å±å¹•ä¸Š(éœ€è¦å¦ä¸€ä¸ªè½½ä½“æ¥æ‰¿æ‹…è¿™ä¸ªè´´å›¾)
+// 
+//å¸§ç¼“å†²çº¹ç†ï¼š
+//åœ¨ OpenGL ä¸­ï¼Œé€šå¸¸éœ€è¦åœ¨ GPU ä¸Šå‡†å¤‡ä¸¤ä¸ªçº¹ç†ä½ç½®ï¼š
+//ä¸€ä¸ªçº¹ç†ä½ç½®ä½œä¸ºè¯»å…¥ç›®æ ‡ï¼šç”¨äºè¯»å–æ•°æ®ï¼Œé€šå¸¸æ˜¯åœ¨åå¤„ç†ã€è®¡ç®—ã€æˆ–è€…ä½¿ç”¨ä¹‹å‰æ¸²æŸ“ç»“æœçš„åœºæ™¯ä¸­ã€‚ä¾‹å¦‚ï¼Œåå¤„ç†æ•ˆæœä¼šä½¿ç”¨æ¸²æŸ“ç»“æœçº¹ç†ä½œä¸ºè¾“å…¥ã€‚
+//ä¸€ä¸ªçº¹ç†ä½ç½®ä½œä¸ºå†™å…¥ç›®æ ‡ï¼šå³å¸§ç¼“å†²çš„é™„ä»¶ã€‚è¿™ä¸ªçº¹ç†ç”¨äºå­˜å‚¨æ¸²æŸ“æ“ä½œçš„ç»“æœï¼Œæ¸²æŸ“çš„å›¾åƒä¼šè¢«å†™å…¥åˆ°è¿™ä¸ªçº¹ç†ä¸­ï¼Œè€Œä¸æ˜¯ç›´æ¥æ˜¾ç¤ºåˆ°å±å¹•ä¸Šã€‚
+//åœ¨ä¸€ä¸ª å¸§ç¼“å†²å¯¹è±¡ï¼ˆFramebuffer, FBOï¼‰ ä¸­ï¼Œå¯ä»¥æœ‰å¤šä¸ªé™„ä»¶ï¼ŒåŒ…æ‹¬ï¼š
+//å¤šä¸ªçº¹ç†é™„ä»¶ï¼ˆå¯ä»¥æ˜¯é¢œè‰²çº¹ç†é™„ä»¶ã€æ·±åº¦çº¹ç†é™„ä»¶ã€æ¨¡æ¿çº¹ç†é™„ä»¶ï¼‰ã€ä¸€ä¸ªæ·±åº¦é™„ä»¶ ã€ ä¸€ä¸ªæ¨¡æ¿é™„ä»¶ã€‚
+// 
+//çº¹ç†é™„ä»¶ï¼š
+//çº¹ç†é™„ä»¶å¯ä»¥åˆ†ä¸ºå¤šç§ç±»å‹ï¼Œä¾‹å¦‚ï¼šé¢œè‰²çº¹ç†é™„ä»¶ã€æ·±åº¦çº¹ç†é™„ä»¶ã€æ¨¡æ¿çº¹ç†é™„ä»¶
+//çº¹ç†é™„ä»¶åªæ˜¯ä¸€ä¸ªç»Ÿç§°ï¼Œå®é™…ä¸Šå…·ä½“çš„é¢œè‰²æ•°æ®ã€æ·±åº¦çº¹ç†æ•°æ®ã€æ¨¡æ¿çº¹ç†æ•°æ®éƒ½å­˜åœ¨çº¹ç†é™„ä»¶ä¸‹çš„é¢œè‰²é™„ä»¶ã€æ·±åº¦çº¹ç†é™„ä»¶ã€æ¨¡æ¿çº¹ç†é™„ä»¶ä¸­
+//æ·±åº¦é™„ä»¶ä¸æ·±åº¦çº¹ç†é™„ä»¶ï¼Œæ¨¡æ¿é™„ä»¶ä¸æ¨¡æ¿çº¹ç†é™„ä»¶ï¼š
+//æ·±åº¦é™„ä»¶ or æ¨¡æ¿é™„ä»¶ï¼šç”±æ·±åº¦ç¼“å†²åŒºã€æ¨¡æ¿ç¼“å†²åŒºåˆ›å»ºï¼Œåªèƒ½ç”¨äºæ·±åº¦æ£€æµ‹å’Œæ¨¡æ¿æ£€æµ‹ï¼Œå…·ä½“æ•°æ®æ— æ³•è¢«é‡‡æ ·
+//æ·±åº¦çº¹ç†é™„ä»¶ or æ¨¡æ¿çº¹ç†é™„ä»¶ï¼šç”±çº¹ç†åˆ›å»ºï¼Œä¸ä»…èƒ½å­˜å‚¨æ·±åº¦ä¿¡æ¯å’Œæ¨¡æ¿ä¿¡æ¯ï¼Œè¿˜èƒ½è¢«é‡‡æ ·ä½¿ç”¨ï¼Œå®Œæˆåå¤„ç†æ•ˆæœ
+
+/*ç«‹æ–¹ä½“è´´å›¾*/
+//å¤©ç©ºç›’ï¼š
+//ä¸€ã€ä½¿ç”¨glm::mat4(glm::mat3(view))å»é™¤å¹³ç§»ï¼Œè¿™æ ·ä¸ç®¡æ˜¯å¦ç§»åŠ¨ï¼Œæ‘„åƒæœºçš„ä½ç½®å§‹ç»ˆåœ¨åæ ‡åŸç‚¹ï¼Œå§‹ç»ˆåœ¨å¤©ç©ºç›’å†…éƒ¨
+//äºŒã€ä¸€ç›´æœä¸€ä¸ªæ–¹å‘ç§»åŠ¨å…¶ä»–ç‰©ä½“ï¼Œå³ä½¿è§†é”¥ä½“è®¾ç½®å¾—å¾ˆå¤§ï¼Œç‰©ä½“ä»ç„¶æœ‰å¯èƒ½ç§»å‡ºå¤©ç©ºç›’çš„èŒƒå›´ã€‚ä½†ç”±äºæˆ‘ä»¬ç¦ç”¨äº†å¤©ç©ºç›’çš„æ·±åº¦å†™å…¥ï¼Œ
+//å¤©ç©ºç›’ä¼šå§‹ç»ˆè¢«ç»˜åˆ¶åœ¨åœºæ™¯çš„æœ€è¿œå¤„(æ·±åº¦å€¼ä¸º1.0ï¼Œæœ€è¿œæ·±åº¦)ï¼Œè€Œä¸ä¼šè¦†ç›–å…¶ä»–ç‰©ä½“ï¼Œæ‰€ä»¥å³ä½¿ç‰©ä½“ç§»å‡ºäº†å¤©ç©ºç›’çš„èŒƒå›´ï¼Œå¤©ç©ºç›’ä¾ç„¶ä¼šåœ¨æ¸²æŸ“æ—¶è¦†ç›–æ•´ä¸ªèƒŒæ™¯ã€‚
+//ä¸‰ã€å¦‚æœæˆ‘ä»¬ç¬¬ä¸€ä¸ªæ¸²æŸ“å¤©ç©ºç›’ä¸”ç¦ç”¨æ·±åº¦å†™å…¥ï¼Œåˆ™ä¸ä¼šè¦†ç›–åæ¸²æŸ“çš„ç‰©ä½“ï¼Œä½†åœ¨åç»­æ¸²æŸ“å…¶ä»–ç‰©ä½“æ—¶è¿˜éœ€è¦ä¸¢å¼ƒè¢«é®æŒ¡çš„å¤©ç©ºç›’ç‰‡æ®µï¼Œ
+//æ‰€ä»¥æˆ‘ä»¬å¯ä»¥æœ€åæ¸²æŸ“å¤©ç©ºç›’å¹¶è®©OpenGLå§‹ç»ˆè®¤ä¸ºå¤©ç©ºç›’çš„æ·±åº¦å€¼ä¸º1.0(æœ€è¿œæ·±åº¦å€¼)
+//å››ã€å¦‚æœæˆ‘ä»¬åœ¨æƒ³åœ¨ä»»æ„é¡ºåºæ¸²æŸ“å¤©ç©ºç›’(ä¼˜åŒ–å‡å°‘ç‰‡æ®µæ¸²æŸ“é‡)ï¼Œåˆ™éœ€è¦æš‚æ—¶å°†æ·±åº¦æ£€æµ‹å‡½æ•°è®¾ä¸ºLEAQAL,ä¿è¯å¤©ç©ºç›’ä»…åœ¨å°šæœªå±å¹•ä¸­æ¸²æŸ“è¿‡ç‰©ä½“çš„ä½ç½®é€šè¿‡æ·±åº¦æ£€æµ‹ï¼ŒåŒæ—¶å°†è¿™äº›ä½ç½®æ·±åº¦å€¼æ”¹ä¸º1.0(è™½ç„¶æœ¬æ¥å°±æ˜¯1.0)
+
+/*å‡ ä½•ç€è‰²å™¨*/
+//ä¸€ã€å‡ ä½•ç€è‰²å™¨å¤„äºé¡¶ç‚¹ç€è‰²å™¨å’Œç‰‡æ®µç€è‰²å™¨ä¹‹é—´(è‹¥æ²¡æœ‰æ˜¾å¼ç¼–å†™å‡ ä½•ç€è‰²å™¨åˆ™ä¸ä¼šä½¿ç”¨)ï¼Œç”¨äºç”Ÿæˆæ–°çš„é¡¶ç‚¹å’Œä¿®æ”¹å·²æœ‰çš„å›¾å…ƒ
+//äºŒã€layout () inç”³æ˜ä»é¡¶ç‚¹ç€è‰²å™¨æ¥æ”¶çš„å›¾å…ƒç±»å‹ï¼Œlayout () outç”³æ˜è¾“å‡ºç»™ç‰‡æ®µç€è‰²å™¨çš„å›¾å…ƒç±»å‹å’Œæœ€å¤§é¡¶ç‚¹æ•°
+//ä¸‰ã€EmitVertex():è¾“å‡ºæ–°çš„é¡¶ç‚¹;EndPrimitive():æ‰€æœ‰è¢«EmitVertexè¾“å‡ºçš„é¡¶ç‚¹ä¼šè¢«åˆæˆä¸ºæˆ‘ä»¬åœ¨layout () outä¸­æŒ‡å®šè¿‡çš„å›¾å½¢
+//å››ã€å¦‚æœæˆ‘ä»¬å¯ç”¨äº†å‡ ä½•ç€è‰²å™¨ï¼Œé‚£ä¹ˆä»é¡¶ç‚¹ç€è‰²å™¨ä¸­outçš„å˜é‡å¿…é¡»è¦ä¾é å‡ ä½•ç€è‰²å™¨çš„é—´æ¥ä¼ é€’æ‰èƒ½åœ¨ç‰‡æ®µç€è‰²å™¨ä¸­æ¥æ”¶
+//äº”ã€ä»é¡¶ç‚¹ç€è‰²å™¨å‘å‡ ä½•ç€è‰²å™¨ä¼ é€’æ•°æ®éƒ½æ˜¯ä¸€ç»„ä¸€ç»„ä¼ é€’çš„ï¼Œæ¯ä¸€ç»„åŒ…å«ä¸€ä¸ªå›¾å…ƒæ‰€æœ‰çš„æ‰€æœ‰é¡¶ç‚¹æ•°æ®(ä½ç½®ã€æ³•å‘é‡ã€çº¹ç†åæ ‡ç­‰)
+//å…­ã€å¯ä»¥ç†è§£ä¸ºå‡ ä½•ç€è‰²å™¨ä¸­åˆåŒ…å«äº†ä¸€ä¸ªå›¾å…ƒé¡¶ç‚¹æ•°ç›®ä¸ªæ•°çš„é¡¶ç‚¹ç€è‰²å™¨
+//ä¸ƒã€é¡¶ç‚¹ç€è‰²å™¨ä¸­çš„gl_Positionç®—å‡ºæ¥æ˜¯å“ªä¸ªç©ºé—´çš„ï¼Œå‡ ä½•ç€è‰²å™¨å°±åœ¨å“ªä¸ªç©ºé—´è¿›è¡Œä¸‹ä¸€æ­¥è®¡ç®—
+//å…«ã€å¯ä»¥åœ¨é¡¶ç‚¹ç€è‰²å™¨ä¸­å°†gl_Positonå˜æ¢åˆ°è£å‰ªç©ºé—´ï¼Œä¹Ÿå¯ä»¥å…ˆåœ¨é¡¶ç‚¹ç€è‰²å™¨ä¸­å°†gl_Positionå˜æ¢åˆ°è§‚å¯Ÿç©ºé—´ç„¶ååœ¨å‡ ä½•ç€è‰²å™¨ä¸­è¿›è¡Œå…¶ä»–å¤„ç†å†å°†å…¶å˜æ¢åˆ°è£å‰ªç©ºé—´
+/*ä¹ã€å¦‚æœè¦åœ¨å‡ ä½•ç€è‰²å™¨ä¸­ä½¿ç”¨é¡¶ç‚¹(gl_Position)ä¹‹é—´çš„çº¿æ€§å…³ç³»æ¥è®¡ç®—å…¶ä»–é‡(å¦‚æ³•çº¿)æ—¶ï¼Œè¦ç¡®ä¿ä»é¡¶ç‚¹ç€è‰²å™¨ä¸­è·å–çš„gl_Positonæ˜¯è§‚å¯Ÿç©ºé—´ä¸­çš„é‡ï¼Œè®¡ç®—å®Œè¿˜è¦å†æŠŠgl_Positonè½¬æ¢åˆ°è£å‰ªç©ºé—´ä¸­*/
+
+/*å®ä¾‹åŒ–*/
+//ä¸€ã€uniformæ•°æ®åœ¨æ‰€æœ‰å®ä¾‹ä¸­å…±äº«(ä¸ä½¿ç”¨å®ä¾‹åŒ–ç»˜åˆ¶nä¸ªç‰©ä½“:æ¯ä¸€å¸§å‘glslä¸Šä¼ nä¸ªuniformå€¼;ä½¿ç”¨å®ä¾‹åŒ–ç»˜åˆ¶nä¸ªç‰©ä½“:æ¯ä¸€å¸§å‘glslä¸Šä¼ 1ä¸ªuniformå€¼)
+//äºŒã€åœ¨ç»˜åˆ¶å¤šä¸ªå®ä¾‹æ—¶å¦‚æœå¸Œæœ›ç”¨ä¸åŒçš„modelçŸ©é˜µè¿›è¡Œä½ç½®è°ƒæ•´ï¼Œå¦‚æœä½¿ç”¨uniformæ•°ç»„çš„è¯å¯èƒ½ä¼šè¶…å‡ºæœ€å¤§uniformæ•°é‡ï¼Œæ•…åº”é‡‡ç”¨å®ä¾‹åŒ–æ•°ç»„(å°†modelè®¾ç½®ä¸ºé¡¶ç‚¹å±æ€§:é¡¶ç‚¹å±æ€§åœ¨ç»˜åˆ¶ä¸€ä¸ªæ–°çš„å®ä¾‹æ—¶æ‰ä¼šè¢«æ›´æ–°)
+//ä¸‰ã€ä½¿ç”¨å®ä¾‹åŒ–æ•°ç»„æŠŠæ¨¡å‹çŸ©é˜µ(æˆ–å…¶ä»–æ•°æ®)ä¼ é€’ç»™é¡¶ç‚¹å±æ€§æ—¶å¿…é¡»åœ¨æ¸²æŸ“å¾ªç¯å¤–è¿›è¡Œ
+
+/*æŠ—é”¯é½¿*/
+//ä¸€ã€é”¯é½¿äº§ç”ŸåŸå› :æ¯ä¸ªåƒç´ ä¸­åªæœ‰ä¸€ä¸ªé‡‡æ ·ç‚¹ï¼Œå½“æŸä¸ªå›¾å…ƒè¦†ç›–è¿™ä¸ªé‡‡æ ·ç‚¹æ—¶è¯¥åƒç´ è¢«è®¾ç½®æˆè¯¥å›¾å…ƒçš„é¢œè‰²ï¼Œå¦åˆ™åˆ™ä¸ºåŸæœ¬çš„é¢œè‰²(å¯èƒ½æ—¶å…ˆå‰è¢«å…¶ä»–å›¾å…ƒæ¸²æŸ“è¿‡çš„é¢œè‰²)
+//äºŒã€è¶…é‡‡æ ·æŠ€æœ¯:å°†åŸæœ¬è¦ç»˜åˆ¶çš„å›¾åƒä»¥æ›´é«˜çš„åˆ†è¾¨ç‡è¿›è¡Œç»˜åˆ¶ï¼Œä¹‹åå†å°†å…¶ç¼©å°åˆ°æˆ‘ä»¬æ‰€éœ€çš„åˆ†è¾¨ç‡
+//ä¸‰ã€å¤šé‡é‡‡æ ·æŠ€æœ¯(æœªå¯ç”¨æ ·æœ¬ç€è‰²):å¯¹æ¯ä¸ªåƒç´ åªè¿è¡Œä¸€æ¬¡ç‰‡æ®µç€è‰²å™¨ï¼Œæ¯ä¸ªåƒç´ ä¸­æœ‰å¤šä¸ªé‡‡æ ·ç‚¹ï¼Œæœ€ç»ˆè¯¥åƒç´ çš„é¢œè‰²ä¸ºå„ä¸ªé‡‡æ ·ç‚¹çš„é¢œè‰²çš„å‡å€¼(éœ€è¦ä¸€ä¸ªèƒ½å­˜å‚¨å¤šä¸ªé¢œè‰²çš„é¢œè‰²ç¼“å†²åŒºæ¥è®°å½•æ¯ä¸ªé‡‡æ ·ç‚¹(é‡‡æ ·åˆ°çš„)çš„é¢œè‰²)ã€‚ä¸éœ€è¦é¢å¤–çš„æ·±åº¦ç¼“å†²åŒºå’Œæ¨¡æ¿ç¼“å†²åŒº(ä¸€ä¸ªåƒç´ ä¸­çš„æ¯ä¸ªé‡‡æ ·ç‚¹çš„æ·±åº¦å€¼å’Œæ¨¡æ¿å€¼éƒ½ç›¸åŒ)
+//(å¯ç”¨æ ·æœ¬ç€è‰²):å¯¹æ¯ä¸ªåƒç´ ä¸­çš„æ¯ä¸ªé‡‡æ ·ç‚¹éƒ½è¿è¡Œä¸€æ¬¡ç‰‡æ®µç€è‰²å™¨ï¼Œä»éœ€è¦ä¸€ä¸ªèƒ½å­˜å‚¨å¤šä¸ªé¢œè‰²çš„é¢œè‰²ç¼“å†²åŒºæ¥è®°å½•æ¯ä¸ªé‡‡æ ·ç‚¹(é‡‡æ ·åˆ°çš„)çš„é¢œè‰²ï¼Œåªä¸è¿‡æœ€ç»ˆåƒç´ é¢œè‰²ä¸åšæ±‚å’Œè€Œæ˜¯ç›´æ¥è¾“å‡ºæ¯ä¸ªé‡‡æ ·ç‚¹çš„é¢œè‰²ã€‚
+//å››ã€ç¦»å±å¤šé‡é‡‡æ ·æŠ€æœ¯:ä¸å†éœ€è¦é¢å¤–çš„é¢œè‰²ç¼“å†²åŒºï¼Œè€Œæ˜¯éœ€è¦é¢å¤–çš„å¤šé‡é‡‡æ ·çº¹ç†é¢œè‰²çº¹ç†é™„ä»¶(æŸç§æ„ä¹‰ä¸Šè®²å°±ç›¸å½“äºé¢œè‰²ç¼“å†²åŒº)ã€‚åŒæ—¶ä¹Ÿéœ€è¦é¢å¤–çš„æ·±åº¦æ¨¡æ¿çº¹ç†é™„ä»¶(è™½ç„¶åŒä¸€ä¸ªåƒç´ ä¸­çš„é‡‡æ ·ç‚¹çš„æ·±åº¦æ¨¡æ¿å€¼éƒ½ç›¸åŒï¼Œä½†ä»ä¼šå¯¹æ¯ä¸€ä¸ªé‡‡æ ·ç‚¹éƒ½è¿›è¡Œæ·±åº¦æ¨¡æ¿æ£€æµ‹)
+//å¤šé‡é‡‡æ ·çº¹ç†é™„ä»¶ä¸åŒäºæ™®é€šçš„é¢œè‰²çº¹ç†é™„ä»¶ï¼Œå®ƒæ— æ³•ç›´æ¥è¢«è®¿é—®ï¼Œå¿…é¡»ä¾é glBlitFramebufferæ¥å°†å…¶è§£æåˆ°å¦ä¸€ä¸ªæ™®é€šçš„å¸§ç¼“å†²(æ™®é€šé¢œè‰²çº¹ç†é™„ä»¶)ä¸­æ‰èƒ½è®¿é—®(å¯¹è¿™ä¸ªé¢œè‰²é™„ä»¶è¿›è¡Œåå¤„ç†ç­‰ç€è‰²å™¨æ“ä½œ)
+//å…·ä½“æµç¨‹:å…ˆå°†åœºæ™¯æ¸²æŸ“åˆ°å¤šé‡é‡‡æ ·çº¹ç†ä¸­ï¼Œç„¶åè§£æè¯¥å¤šé‡é‡‡æ ·çº¹ç†ä¸ºæ™®é€šçš„çº¹ç†ï¼Œå†å°†è§£æåçš„æ™®é€šçº¹ç†ç»˜åˆ¶åˆ°ä¸€ä¸ªå››è¾¹å½¢ä¸Šå¹¶æ˜¾ç¤ºåœ¨å±å¹•ä¸Šã€‚
+
+
+
+
+
